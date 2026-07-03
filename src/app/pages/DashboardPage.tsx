@@ -23,7 +23,6 @@ import { getEffectiveTier, TIER_ATHLETE } from '../utils/tier';
 import { PipelinesSection } from '../components/dashboard/PipelinesSection';
 import { RecentRunsSection } from '../components/dashboard/RecentRunsSection';
 import { ActionRequiredSection } from '../components/dashboard/ActionRequiredSection';
-import { RecipeSection } from '../components/dashboard/RecipeSection';
 import { UploadSection } from '../components/dashboard/UploadSection';
 import { GuidedTour } from '../components/onboarding/GuidedTour';
 import { GuidedTourProvider, useGuidedTour } from '../hooks/useGuidedTour';
@@ -194,7 +193,6 @@ const DashboardPageInner: React.FC = () => {
                 <DashboardBody>
                     <DashboardCol>
                         <ActionRequiredSection />
-                        <RecipeSection />
                         <UploadSection />
                     </DashboardCol>
                     <DashboardCol>

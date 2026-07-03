@@ -14,13 +14,6 @@
   .dark-band__label { font-family: var(--fg-font-mono); font-size: .8125rem; font-weight: 700; letter-spacing: .14em; color: var(--fg-paper); text-transform: uppercase; }
   .dark-band__right { font-family: var(--fg-font-mono); font-size: .6875rem; letter-spacing: .14em; color: var(--color-text-muted); text-transform: uppercase; }
 
-  /* ── Aurora band (Recipes promo) ── */
-  .aurora-band { padding: 18px 32px; background: var(--gradient-primary); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-  .aurora-band__content { flex: 1; }
-  .aurora-band__badge { font-family: var(--fg-font-mono); font-size: .625rem; font-weight: 700; letter-spacing: .14em; background: var(--fg-ink); color: var(--fg-paper); padding: 2px 8px; display: inline-block; margin-bottom: 6px; text-transform: uppercase; }
-  .aurora-band__text { font-family: var(--fg-font-body); font-size: .9375rem; color: var(--fg-ink); line-height: 1.5; }
-  .aurora-band__btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: var(--fg-ink); color: var(--fg-paper); font-family: var(--fg-font-display); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; flex-shrink: 0; }
-
   /* ── Guide card grid ── */
   .guide-grid { padding: 0 32px 80px; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
   .guide-card { padding: 28px; background: var(--fg-ink-2); display: flex; flex-direction: column; gap: 12px; min-height: 200px; text-decoration: none; color: inherit; transition: box-shadow .15s; }
@@ -47,7 +40,6 @@
     .guide-grid { grid-template-columns: 1fr; padding: 0 16px 48px; }
     .guide-card--featured { grid-column: span 1; flex-direction: column; }
     .ph { padding: 40px 16px; }
-    .aurora-band { flex-direction: column; align-items: flex-start; }
     .guide-cta { padding: 40px 16px; }
   }
 </style>
@@ -57,15 +49,6 @@
     <div class="ph__eyebrow">GUIDES &amp; TUTORIALS</div>
     <h1 class="ph__title">Learn <span class="gr">FitGlue.</span></h1>
     <p class="ph__sub">From first steps to advanced pipelines. Step-by-step guides for every part of the platform.</p>
-  </div>
-
-  <!-- Recipes promo band -->
-  <div class="aurora-band">
-    <div class="aurora-band__content">
-      <span class="aurora-band__badge">NEW · RECIPES</span>
-      <p class="aurora-band__text">Skip the setup guides — import pre-built pipeline configurations with one click and start transforming your data in seconds.</p>
-    </div>
-    <a href="/app/recipes" class="aurora-band__btn">BROWSE RECIPES →</a>
   </div>
 
   <!-- Start here -->

@@ -62,18 +62,6 @@ export const SMART_NUDGES: SmartNudgeDefinition[] = [
         cta: 'Set Up Connections',
         route: '/connections',
     },
-    {
-        id: 'no-pipelines',
-        pages: ['dashboard'],
-        condition: { type: 'no_pipelines' },
-        priority: 90,
-        icon: '🚀',
-        title: 'Grab a Recipe to Get Started',
-        description: 'One-click pipeline setups for common goals — no configuration needed.',
-        cta: 'Browse Recipes',
-        route: '/recipes',
-    },
-
     // ── Medium priority: missing enricher suggestions ──
     {
         id: 'hevy-missing-muscle-heatmap',
@@ -104,51 +92,5 @@ export const SMART_NUDGES: SmartNudgeDefinition[] = [
         description: 'See fitness, fatigue, and form trends by adding Training Load to your Strava pipeline.',
         cta: 'Edit Pipeline',
         route: '/settings/pipelines',
-    },
-
-    // ── Missing destination suggestions ──
-    {
-        id: 'missing-showcase',
-        pages: ['dashboard', 'pipelines'],
-        condition: {
-            type: 'missing_destination',
-            destinationId: 'showcase',
-        },
-        priority: 40,
-        icon: '🔗',
-        title: 'Share Workouts Without Strava',
-        description: 'Add Showcase to create public activity pages anyone can view — no account needed.',
-        cta: 'Browse Recipes',
-        route: '/recipes',
-    },
-
-    // ── Unused connection ──
-    {
-        id: 'unused-hevy',
-        pages: ['connections', 'dashboard'],
-        condition: {
-            type: 'unused_connection',
-            integrationId: 'hevy',
-        },
-        priority: 30,
-        icon: '🏋️',
-        title: 'Hevy is Connected — Now Use It',
-        description: 'Create a pipeline to auto-post your strength training to Strava with exercise breakdowns.',
-        cta: 'Browse Recipes',
-        route: '/recipes',
-    },
-    {
-        id: 'unused-fitbit',
-        pages: ['connections', 'dashboard'],
-        condition: {
-            type: 'unused_connection',
-            integrationId: 'fitbit',
-        },
-        priority: 30,
-        icon: '💜',
-        title: 'Fitbit is Connected — Merge Heart Rate Data',
-        description: 'Add accurate calories, training zones, and intensity data to your Strava activities.',
-        cta: 'Browse Recipes',
-        route: '/recipes',
     },
 ];

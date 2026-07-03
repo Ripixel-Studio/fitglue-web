@@ -36,9 +36,9 @@ describe('CommandPalette', () => {
     render(<CommandPalette onClose={vi.fn()} />, { wrapper: Wrapper });
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Search commands' }),
-      'recipes',
+      'connections',
     );
-    expect(screen.getByText('Recipes')).toBeInTheDocument();
+    expect(screen.getByText('Connections')).toBeInTheDocument();
     expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('CommandPalette', () => {
   it('activates an item on click and closes', async () => {
     const onClose = vi.fn();
     render(<CommandPalette onClose={onClose} />, { wrapper: Wrapper });
-    await userEvent.click(screen.getByText('Recipes'));
+    await userEvent.click(screen.getByText('Connections'));
     expect(onClose).toHaveBeenCalled();
   });
 

@@ -75,45 +75,6 @@
 }
 
 /* ==========================================================================
-   Recipe panel — aurora-wash sub-section in left column
-   ========================================================================== */
-
-.recipe-panel {
-    padding: 1.125rem 1.25rem;
-    border-bottom: var(--fg-rule-thin);
-    background: linear-gradient(135deg, rgba(255, 61, 166, 0.1), rgba(139, 92, 246, 0.1) 50%, rgba(34, 211, 238, 0.1));
-}
-
-.recipe-panel__head {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.recipe-panel__icon {
-    font-size: 1.625rem;
-}
-
-.recipe-panel__title {
-    font-family: var(--fg-font-display);
-    font-size: 0.9375rem;
-    letter-spacing: -0.005em;
-    text-transform: uppercase;
-}
-
-.recipe-panel__desc {
-    font-family: var(--fg-font-body);
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-    margin-top: 0.5rem;
-    line-height: 1.45;
-}
-
-.recipe-panel__cta {
-    margin-top: 0.75rem;
-}
-
-/* ==========================================================================
    Upload dropzone — cyan-wash sub-section in left column
    ========================================================================== */
 

@@ -30,7 +30,6 @@ import SubscriptionPage from './pages/SubscriptionPage';
 import AdminPage from './pages/AdminPage';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import ShowcaseManagementPage from './pages/ShowcaseManagementPage';
-import RecipesPage from './pages/RecipesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ComponentLibraryPage from './pages/ComponentLibraryPage';
 
@@ -232,7 +231,6 @@ const App: React.FC = () => {
               <Route path="/settings/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
               <Route path="/settings/showcase" element={<ProtectedRoute><ShowcaseManagementPage /></ProtectedRoute>} />
               <Route path="/settings/upgrade" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
-              <Route path="/recipes" element={<ProtectedRoute><RecipesPage /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
               <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetailPage /></AdminRoute>} />
               {/* Dev tool — component library gallery (no auth required) */}

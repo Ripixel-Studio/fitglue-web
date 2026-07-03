@@ -48,7 +48,7 @@ web/
 │   │   ├── services/         # API service wrappers (ActivitiesService, InputsService)
 │   │   ├── utils/            # Formatters, tier utils, color utils
 │   │   ├── infrastructure/   # Sentry init
-│   │   └── data/             # Static data (recipes, smartNudges)
+│   │   └── data/             # Static data (smartNudges)
 │   ├── shared/
 │   │   ├── firebase.ts       # Firebase SDK init
 │   │   └── api/              # API clients + generated schemas
@@ -168,7 +168,6 @@ All routes have basename `/app`. Protected routes require Firebase auth + `profi
 | `/settings/upgrade` | SubscriptionPage (alias) |
 | `/settings/showcase` | ShowcaseManagementPage |
 | `/settings/integrations` | ConnectionsPage (legacy redirect) |
-| `/recipes` | RecipesPage |
 | `/admin` | AdminPage (admin only) |
 
 ## Common Tasks

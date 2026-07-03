@@ -2,69 +2,6 @@
    ConnectionsPage — Brutal × Aurora reskin
    ========================================================================== */
 
-/* Recipe suggestion band */
-.conn-recipe-band {
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, rgba(255,61,166,.08), rgba(34,211,238,.06));
-  border-bottom: var(--fg-rule-thin);
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.conn-recipe-band__label {
-  font-family: var(--fg-font-mono);
-  font-size: 0.5625rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--fg-cyan);
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.conn-recipe-band__text {
-  font-family: var(--fg-font-mono);
-  font-size: 0.75rem;
-  color: var(--fg-paper);
-  letter-spacing: 0.04em;
-  flex: 1;
-}
-
-.conn-recipe-band__cta {
-  font-family: var(--fg-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--fg-ink);
-  background: var(--gradient-primary);
-  padding: 0.375rem 0.875rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  border: none;
-  white-space: nowrap;
-  transition: opacity var(--transition-fast);
-}
-
-.conn-recipe-band__cta:hover {
-  opacity: 0.85;
-}
-
-.conn-recipe-band__dismiss {
-  font-family: var(--fg-font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.conn-recipe-band__dismiss:hover {
-  color: var(--fg-paper);
-}
-
 /* Connection tile grid */
 .conn-grid {
   display: grid;

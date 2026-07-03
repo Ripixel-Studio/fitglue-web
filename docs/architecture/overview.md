@@ -94,7 +94,6 @@ The React app uses a **split architecture** for data access:
 | `/app/settings/subscription` | SubscriptionPage |
 | `/app/settings/upgrade` | SubscriptionPage (alias) |
 | `/app/settings/showcase` | ShowcaseManagementPage |
-| `/app/recipes` | RecipesPage |
 | `/app/settings/integrations` | ConnectionsPage (legacy) |
 | `/app/admin` | AdminPage |
 

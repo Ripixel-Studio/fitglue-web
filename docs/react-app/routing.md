@@ -35,7 +35,6 @@ The React app is mounted at `/app`, so all routes are prefixed:
 | `/settings/enricher-data` | `EnricherDataPage` | Protected | Enricher data (PRs, etc.) |
 | `/settings/showcase` | `ShowcaseManagementPage` | Protected | Showcase management |
 | `/settings/integrations` | `ConnectionsPage` | Protected | Legacy redirect (prefer `/connections`) |
-| `/recipes` | `RecipesPage` | Protected | Recipe browser |
 | `/admin` | `AdminPage` | Admin | Admin console |
 | `*` | `NotFoundPage` | None | 404 handler |
 
@@ -70,7 +69,6 @@ The React app is mounted at `/app`, so all routes are prefixed:
     <Route path="/settings/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
     <Route path="/settings/upgrade" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
     <Route path="/settings/showcase" element={<ProtectedRoute><ShowcaseManagementPage /></ProtectedRoute>} />
-    <Route path="/recipes" element={<ProtectedRoute><RecipesPage /></ProtectedRoute>} />
 
     {/* Admin-only */}
     <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
@@ -208,7 +206,6 @@ pages/
 ├── SubscriptionPage.tsx           # Subscription management
 ├── ShowcaseManagementPage.tsx     # Showcase management
 ├── EnricherDataPage.tsx           # Personal records, etc.
-├── RecipesPage.tsx                # Recipe browser
 ├── AdminPage.tsx                  # Admin console
 └── NotFoundPage.tsx               # 404 handler
 ```

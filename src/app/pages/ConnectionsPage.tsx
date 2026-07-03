@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '../components/library/layout';
 import { SmartNudge } from '../components/SmartNudge';
@@ -10,8 +10,6 @@ import { usePluginRegistry } from '../hooks/usePluginRegistry';
 import '../components/library/ui/CardSkeleton.css';
 import { IntegrationManifest } from '../types/plugin';
 import './ConnectionsPage.css';
-
-const RECIPE_DISMISSED_KEY = 'fitglue_recipe_band_dismissed';
 
 interface IntegrationStatus {
     connected: boolean;
@@ -133,15 +131,6 @@ const ConnectionsPage: React.FC = () => {
     const { integrations: registryIntegrations, sources, destinations, loading: registryLoading } = usePluginRegistry();
     const { integrations, loading, refresh: refreshIntegrations } = useRealtimeIntegrations();
 
-    const [recipeDismissed, setRecipeDismissed] = useState(() =>
-        localStorage.getItem(RECIPE_DISMISSED_KEY) === 'true'
-    );
-
-    const dismissRecipe = () => {
-        localStorage.setItem(RECIPE_DISMISSED_KEY, 'true');
-        setRecipeDismissed(true);
-    };
-
     const handleConnect = (integration: IntegrationManifest) => {
         navigate(`/connections/${integration.id}/setup`);
     };
@@ -177,13 +166,6 @@ const ConnectionsPage: React.FC = () => {
 
     const statuses = integrations as Record<string, IntegrationStatus | undefined> | null;
 
-    const connectedCount = registryIntegrations.filter(i => statuses?.[i.id]?.connected).length;
-
-    // Find a good recipe suggestion — first unconnected source + first unconnected destination
-    const suggestedSource = sourceIntegrations.find(i => !statuses?.[i.id]?.connected);
-    const suggestedDest = destinationIntegrations.find(i => !statuses?.[i.id]?.connected);
-    const showRecipeBand = !recipeDismissed && !!suggestedSource && !!suggestedDest && connectedCount > 0;
-
     if (loading || registryLoading) {
         return (
             <PageLayout title="Connections">
@@ -218,25 +200,6 @@ const ConnectionsPage: React.FC = () => {
             onRefresh={refreshIntegrations}
         >
             <SmartNudge page="connections" />
-
-            {/* Suggested recipe band */}
-            {showRecipeBand && (
-                <div className="conn-recipe-band">
-                    <span className="conn-recipe-band__label">✦ SUGGESTED</span>
-                    <span className="conn-recipe-band__text">
-                        Connect <b>{suggestedSource!.name}</b> → <b>{suggestedDest!.name}</b> to start syncing automatically
-                    </span>
-                    <button
-                        className="conn-recipe-band__cta"
-                        onClick={() => navigate(`/connections/${suggestedSource!.id}/setup`)}
-                    >
-                        SET UP →
-                    </button>
-                    <button className="conn-recipe-band__dismiss" onClick={dismissRecipe} aria-label="Dismiss suggestion">
-                        ✕
-                    </button>
-                </div>
-            )}
 
             <TileGroup
                 label="SOURCES"

@@ -19,7 +19,6 @@ const PRIMARY_NAV = [
     { key: 'pipelines',   label: 'Pipelines',   to: '/settings/pipelines', end: false },
     { key: 'activities',  label: 'Activities',  to: '/activities',          end: false },
     { key: 'connections', label: 'Connections', to: '/connections',         end: false },
-    { key: 'recipes',     label: 'Recipes',     to: '/recipes',            end: false },
     // Settings is active for all /settings/* except /settings/pipelines (which belongs to Pipelines above)
     { key: 'settings',    label: 'Settings',    to: '/settings/account',   end: false, activePrefix: '/settings/', excludePrefix: '/settings/pipelines' },
 ] as const;

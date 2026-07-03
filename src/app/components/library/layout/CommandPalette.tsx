@@ -51,7 +51,6 @@ const NAV_ITEMS: CommandItem[] = [
     { id: 'nav-pipelines',   icon: '⇉', label: 'Pipelines',   tag: 'PAGE',       href: '/settings/pipelines'     },
     { id: 'nav-activities',  icon: '≡', label: 'Activities',  tag: 'PAGE',       href: '/activities'             },
     { id: 'nav-connections', icon: '⌬', label: 'Connections', tag: 'PAGE',       href: '/connections'            },
-    { id: 'nav-recipes',     icon: '✦', label: 'Recipes',     tag: 'PAGE',       href: '/recipes'                },
     { id: 'nav-settings',    icon: '⚙', label: 'Settings',    tag: 'PAGE',       href: '/settings/account'       },
 ];
 

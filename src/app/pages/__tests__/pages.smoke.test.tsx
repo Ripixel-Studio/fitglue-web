@@ -138,7 +138,6 @@ import EnricherDataPage from '../EnricherDataPage';
 import SubscriptionPage from '../SubscriptionPage';
 import AdminPage from '../AdminPage';
 import ShowcaseManagementPage from '../ShowcaseManagementPage';
-import RecipesPage from '../RecipesPage';
 import NotFoundPage from '../NotFoundPage';
 import ComponentLibraryPage from '../ComponentLibraryPage';
 
@@ -260,11 +259,6 @@ describe('page smoke tests', () => {
 
   it('ShowcaseManagementPage renders', () => {
     const { container } = renderPage(<ShowcaseManagementPage />);
-    expect(container).toBeTruthy();
-  });
-
-  it('RecipesPage renders', () => {
-    const { container } = renderPage(<RecipesPage />);
     expect(container).toBeTruthy();
   });
 
