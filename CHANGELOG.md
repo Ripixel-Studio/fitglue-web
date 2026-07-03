@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.94.1](https://github.com/fitglue/web/compare/v11.94.0...v11.94.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **dashboard:** remove arbitrary PRIMARY pipeline badge ([f394f86](https://github.com/fitglue/web/commit/f394f8620a60cc0f41e321ca5e8de5cbf4f37783))
+
 ## [11.94.0](https://github.com/fitglue/web/compare/v11.93.0...v11.94.0) (2026-07-01)
 
 
