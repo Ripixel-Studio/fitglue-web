@@ -36,7 +36,7 @@ export const PipelinesSection: React.FC = () => {
                 />
             ) : (
                 <div style={{ padding: '0.5rem 1.25rem 1.125rem' }}>
-                    {activePipelines.slice(0, 5).map((pipeline, i) => {
+                    {activePipelines.slice(0, 5).map((pipeline) => {
                         const enricherCount = pipeline.enrichers?.length ?? 0;
                         const source = `${getSourceIcon(pipeline.source)} ${getSourceName(pipeline.source)}`;
                         const dests: [string, string][] = (pipeline.destinations ?? []).map(
@@ -49,7 +49,6 @@ export const PipelinesSection: React.FC = () => {
                                 source={source}
                                 boosters={enricherCount}
                                 dests={dests}
-                                featured={i === 0}
                                 onClick={() => navigate(`/settings/pipelines`)}
                             />
                         );

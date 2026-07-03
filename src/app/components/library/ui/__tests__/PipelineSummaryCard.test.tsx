@@ -28,11 +28,6 @@ describe('PipelineSummaryCard', () => {
     expect(screen.getByText('1 BOOSTER')).toBeInTheDocument();
   });
 
-  it('shows PRIMARY star when featured', () => {
-    render(<PipelineSummaryCard {...base} featured />);
-    expect(screen.getByText('★ PRIMARY')).toBeInTheDocument();
-  });
-
   it('fires onClick', async () => {
     const handler = vi.fn();
     render(<PipelineSummaryCard {...base} onClick={handler} />);

@@ -6,7 +6,6 @@ export interface PipelineSummaryCardProps {
     source: string;
     boosters: number;
     dests: [string, string][];
-    featured?: boolean;
     onClick?: () => void;
 }
 
@@ -15,7 +14,6 @@ export const PipelineSummaryCard: React.FC<PipelineSummaryCardProps> = ({
     source,
     boosters,
     dests,
-    featured,
     onClick,
 }) => (
     <div
@@ -28,7 +26,6 @@ export const PipelineSummaryCard: React.FC<PipelineSummaryCardProps> = ({
         <div className="pipeline-card__top">
             <div className="pipeline-card__name-row">
                 <span className="pipeline-card__name">{name}</span>
-                {featured && <span className="pipeline-card__primary">★ PRIMARY</span>}
             </div>
             <span className="pipeline-card__count">{boosters} BOOSTER{boosters !== 1 ? 'S' : ''}</span>
         </div>
