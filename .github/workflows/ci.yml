@@ -1,0 +1,52 @@
+name: CI
+
+# Runs on every pull request targeting the default branch so a green check
+# can be trusted (e.g. as a required check for auto-merging dependency bumps).
+# Deploys/releases stay in CircleCI (.circleci/config.yml); this workflow only
+# validates PRs and never touches secrets or infrastructure.
+on:
+  pull_request:
+    branches: [main]
+
+# Read-only: this workflow validates code, it does not deploy or publish.
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same PR to keep things fast.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Install the exact versions from package-lock.json, so a bumped
+      # dependency is the version actually exercised by the checks below.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm run test
+
+      # Deterministic, network-free app build (tsc + vite build). This is the
+      # same target CircleCI's build-and-test job uses; the full `npm run build`
+      # is skipped here because its Skier static step fetches the registry API.
+      - name: Build
+        run: npm run _build:app
