@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { logger } from '../../shared/logger';
 import { PendingInput } from '../state/inputsState';
+import type { PipelineRun } from '../../types/pb/user';
 import { InputsService } from '../services/InputsService';
 import { usePluginLookup } from '../hooks/usePluginLookup';
 import { useRealtimePipelines } from '../hooks/useRealtimePipelines';
@@ -56,10 +57,13 @@ const formatAutoDeadline = (deadline?: Date | null): string | null => {
 
 interface PendingInputCardProps {
     input: PendingInput;
+    /** The pipeline run this input belongs to, joined by the page. Supplies the
+     *  current activity title and start time when the input itself lacks them. */
+    activityRun?: PipelineRun;
     onResolved: () => void;
 }
 
-const PendingInputCard: React.FC<PendingInputCardProps> = ({ input, onResolved }) => {
+const PendingInputCard: React.FC<PendingInputCardProps> = ({ input, activityRun, onResolved }) => {
     const { getSourceInfo, getEnricherInfo } = usePluginLookup();
     const { pipelines } = useRealtimePipelines();
     const toast = useToast();
@@ -261,19 +265,24 @@ const PendingInputCard: React.FC<PendingInputCardProps> = ({ input, onResolved }
         .replace(/_/g, ' ')
         .replace(/\b\w/g, (c) => c.toUpperCase());
 
+    // The source_* fields are only populated for FIT-file uploads; for every
+    // other source we fall back to the joined pipeline run so the card can still
+    // show which activity this input maps to.
+    const activityStartTime = input.sourceStartTime ?? activityRun?.startTime;
     const titleBase = input.sourceDisplayName
+        || activityRun?.title
         || [sourceInfo.name, activityTypeHuman].filter(Boolean).join(' ')
         || 'Activity';
 
-    const titleTime = input.sourceStartTime
-        ? input.sourceStartTime.toLocaleString(undefined, {
+    const titleTime = activityStartTime
+        ? activityStartTime.toLocaleString(undefined, {
             day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
           })
         : '';
     const titleText = titleTime ? `${titleBase} · ${titleTime}` : titleBase;
 
     const metaSource = sourceInfo.name;
-    const metaTime = input.sourceStartTime ? formatSourceStartTime(input.sourceStartTime) : '';
+    const createdLabel = formatSourceStartTime(input.createdAt);
 
     const showForm = !isAutoPopulated || deadlinePassed;
 
@@ -289,11 +298,11 @@ const PendingInputCard: React.FC<PendingInputCardProps> = ({ input, onResolved }
                     <div className="pi__title">
                         {activityIcon} {titleText}
                     </div>
-                    {(metaSource || metaTime || pipelineName) && (
+                    {(metaSource || pipelineName || createdLabel) && (
                         <div className="pi__meta">
                             {metaSource}
-                            {metaTime && ` · ${metaTime}`}
                             {pipelineName && <> · VIA <b>{pipelineName}</b></>}
+                            {createdLabel && <> · ADDED {createdLabel}</>}
                         </div>
                     )}
                 </div>

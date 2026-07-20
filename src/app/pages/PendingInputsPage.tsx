@@ -1,11 +1,31 @@
+import { useMemo } from 'react';
 import { useRealtimeInputs } from '../hooks/useRealtimeInputs';
+import { useRealtimePipelineRuns } from '../hooks/useRealtimePipelineRuns';
 import { Button } from '../components/library/ui';
 import { PageLayout } from '../components/library/layout';
 import PendingInputCard, { isUrgent } from '../components/PendingInputCard';
+import type { PipelineRun } from '../../types/pb/user';
 import './PendingInputsPage.css';
 
 const PendingInputsPage = () => {
     const { inputs, loading, refresh } = useRealtimeInputs();
+    // Pending inputs carry very little activity context (often just the source),
+    // so we join each one to its pipeline run to surface the current activity
+    // title and the time the activity took place.
+    const { pipelineRuns } = useRealtimePipelineRuns(true, 100);
+
+    const runForInput = useMemo(() => {
+        const byActivity = new Map<string, PipelineRun>();
+        const byPendingInput = new Map<string, PipelineRun>();
+        for (const run of pipelineRuns) {
+            if (run.activityId) byActivity.set(run.activityId, run);
+            if (run.pendingInputId) byPendingInput.set(run.pendingInputId, run);
+            for (const id of run.nonBlockingPendingInputIds ?? []) {
+                byPendingInput.set(id, run);
+            }
+        }
+        return { byActivity, byPendingInput };
+    }, [pipelineRuns]);
 
     const urgentCount = inputs.filter(i => isUrgent(i.autoDeadline)).length;
 
@@ -61,6 +81,10 @@ const PendingInputsPage = () => {
                         <PendingInputCard
                             key={input.id || input.activityId}
                             input={input}
+                            activityRun={
+                                (input.id ? runForInput.byPendingInput.get(input.id) : undefined)
+                                ?? runForInput.byActivity.get(input.activityId)
+                            }
                             onResolved={refresh}
                         />
                     ))}
