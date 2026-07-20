@@ -52,4 +52,34 @@ describe('PendingInputCard', () => {
     expect(screen.getByText('SUBMIT →')).toBeInTheDocument();
     expect(screen.getByText('Description')).toBeInTheDocument();
   });
+
+  it('shows the activity title and start time from the joined pipeline run', () => {
+    const input = {
+      activityId: 'hevy:abc',
+      requiredFields: ['description'],
+      createdAt: new Date('2026-07-20T09:00:00Z'),
+    } as unknown as PendingInput;
+    const activityRun = {
+      activityId: 'hevy:abc',
+      title: 'Evening Push Session',
+      startTime: new Date('2026-07-19T18:30:00Z'),
+    } as unknown as import('../../../types/pb/user').PipelineRun;
+    render(<PendingInputCard input={input} activityRun={activityRun} onResolved={vi.fn()} />, { wrapper: Wrapper });
+    // Title comes from the run, not just the bare source name.
+    expect(screen.getByText(/Evening Push Session/)).toBeInTheDocument();
+    // The input's creation time is surfaced so it can be told apart from siblings.
+    expect(screen.getByText(/ADDED/)).toBeInTheDocument();
+  });
+
+  it('falls back gracefully with no run and no source metadata', () => {
+    const input = {
+      activityId: 'hevy:abc',
+      requiredFields: ['description'],
+      createdAt: new Date('2026-07-20T09:00:00Z'),
+    } as unknown as PendingInput;
+    render(<PendingInputCard input={input} onResolved={vi.fn()} />, { wrapper: Wrapper });
+    // Still shows the source name and the creation time.
+    expect(screen.getAllByText(/Hevy/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/ADDED/)).toBeInTheDocument();
+  });
 });
