@@ -34,10 +34,14 @@ export default function ParkrunModule({ data }: Props): React.ReactElement | nul
           <span className="mini__value">{data.ageGrade}</span>
           <span className="mini__label">AGE GRADE</span>
         </div>
-        <div className="mini">
-          <span className="mini__value">{data.totalParkruns}</span>
-          <span className="mini__label">TOTAL RUNS</span>
-        </div>
+        {/* Total run count is unknown for manual entries (the fetch never resolved),
+            where it arrives as 0/undefined — omit the tile rather than show "0". */}
+        {(data.totalParkruns ?? 0) > 0 && (
+          <div className="mini">
+            <span className="mini__value">{data.totalParkruns}</span>
+            <span className="mini__label">TOTAL RUNS</span>
+          </div>
+        )}
       </div>
     </Module>
   );
