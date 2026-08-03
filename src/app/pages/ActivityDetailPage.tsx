@@ -10,6 +10,7 @@ import { CardSkeleton, Heading, Paragraph, Code, Button, SvgAsset, useToast, Pro
 import '../components/library/ui/CardSkeleton.css';
 import { MagicActionsPopover } from '../components/MagicActionsPopover';
 import PendingInputCard from '../components/PendingInputCard';
+import type { PendingInput } from '../hooks/useRealtimeInputs';
 import { client } from '../../shared/api/client';
 import { formatActivityType, formatDestination, formatDestinationStatus } from '../../types/pb/enum-formatters';
 import { buildDestinationUrl } from '../utils/destinationUrls';
@@ -257,6 +258,30 @@ const getStatusInfo = (status?: PipelineRunStatus): {
     }
 };
 
+/**
+ * Select the pending inputs that belong to a given run.
+ *
+ * Every pending input the pipeline creates carries `linkedActivityId`, which the
+ * server sets to the owning run's `activityId` — for BOTH blocking and non-blocking
+ * inputs (see the enricher orchestrator's `handleWaitError` /
+ * `createNonBlockingPendingInput`). That is the reliable join key: a pending input's
+ * own `activityId`/`id` is the stable `source:external:provider` document ID, which
+ * never equals a run's random-UUID `activityId`, so matching on that can never work.
+ *
+ * We additionally fall back to the run's denormalized `pendingInputId` /
+ * `nonBlockingPendingInputIds` so inputs still surface on older run documents written
+ * before `linked_activity_id` was populated.
+ */
+export function selectRunPendingInputs(inputs: PendingInput[], run: PipelineRun): PendingInput[] {
+    const denormalizedIds = new Set(
+        [run.pendingInputId, ...run.nonBlockingPendingInputIds].filter((v): v is string => Boolean(v))
+    );
+    return inputs.filter(i =>
+        (Boolean(i.linkedActivityId) && i.linkedActivityId === run.activityId) ||
+        (denormalizedIds.size > 0 && (denormalizedIds.has(i.activityId) || denormalizedIds.has(i.id ?? '')))
+    );
+}
+
 const ActivityDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { pipelines } = useRealtimePipelines();
@@ -280,17 +305,10 @@ const ActivityDetailPage: React.FC = () => {
     }, [pipelineRuns, id]);
 
     // Find pending inputs belonging to this run
-    const relevantInputs = useMemo(() => {
-        if (!pipelineRun) return [];
-        const pendingIds = new Set(
-            [pipelineRun.pendingInputId, ...pipelineRun.nonBlockingPendingInputIds]
-                .filter((v): v is string => Boolean(v))
-        );
-        return inputs.filter(i =>
-            i.activityId === pipelineRun.activityId ||
-            (pendingIds.size > 0 && (pendingIds.has(i.activityId) || pendingIds.has(i.id ?? '')))
-        );
-    }, [inputs, pipelineRun]);
+    const relevantInputs = useMemo(
+        () => (pipelineRun ? selectRunPendingInputs(inputs, pipelineRun) : []),
+        [inputs, pipelineRun]
+    );
 
     // Memoized data extraction from PipelineRun
     const {
