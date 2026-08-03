@@ -258,6 +258,25 @@ describe('ParkrunModule', () => {
     );
     expect(getByText('21:30')).toBeInTheDocument();
     expect(getByText('TIME PB')).toBeInTheDocument();
+    expect(getByText('50')).toBeInTheDocument();
+    expect(getByText('TOTAL RUNS')).toBeInTheDocument();
+  });
+
+  it('omits the TOTAL RUNS tile for a manual entry with no run count', () => {
+    const { queryByText, getByText } = render(
+      <ParkrunModule
+        data={as({
+          eventName: 'Bushy Parkrun',
+          finishTime: '21:30',
+          position: 12,
+          ageGrade: '65%',
+          totalParkruns: 0,
+        })}
+      />,
+    );
+    // Position and time still render; the bogus "0 TOTAL RUNS" tile does not.
+    expect(getByText('#12')).toBeInTheDocument();
+    expect(queryByText('TOTAL RUNS')).not.toBeInTheDocument();
   });
 });
 
