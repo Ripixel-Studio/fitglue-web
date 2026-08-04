@@ -191,7 +191,10 @@
 /* ── Main 2-column ── */
 .rd-main {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    /* minmax(0, 1fr) so the body track can shrink below its content's
+       min-content width — without it, long provider/summary text forces the
+       track (and the page) wider than a phone viewport, causing overflow. */
+    grid-template-columns: 320px minmax(0, 1fr);
     min-height: 60vh;
     align-items: start;
     border-top: var(--fg-rule-thin);
@@ -205,6 +208,7 @@
     top: 0;
     max-height: 100vh;
     overflow-y: auto;
+    min-width: 0;
 }
 
 .rd-rail__head {
@@ -230,12 +234,18 @@
 .rd-step-row {
     padding: 12px 18px;
     display: grid;
-    grid-template-columns: 32px 1fr auto;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
     gap: 10px;
     align-items: start;
     border-bottom: var(--fg-rule-thin);
     position: relative;
     cursor: default;
+}
+
+/* Text column between the SRC/ENR/DST label and the status pill: must be
+   allowed to shrink and wrap so the right-aligned pill stays on-screen. */
+.rd-step-row > div {
+    min-width: 0;
 }
 
 .rd-step-row.active { background: var(--fg-ink-3); }
@@ -265,6 +275,7 @@
     letter-spacing: -.005em;
     text-transform: uppercase;
     line-height: 1.1;
+    overflow-wrap: anywhere;
 }
 
 .rd-step-row__service {
@@ -274,6 +285,7 @@
     color: var(--color-text-muted);
     margin-top: 3px;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
 }
 
 .rd-step-row__time {
@@ -302,7 +314,7 @@
 .rd-step-row__pill--queue { background: transparent; color: var(--fg-paper); box-shadow: inset 0 0 0 1.5px var(--fg-paper); }
 
 /* ── Right body ── */
-.rd-body { padding: 0; }
+.rd-body { padding: 0; min-width: 0; }
 
 .rd-providers-head {
     padding: 12px 32px;
@@ -325,9 +337,13 @@
     padding: 14px 32px;
     border-bottom: var(--fg-rule-thin);
     display: grid;
-    grid-template-columns: 36px 1fr auto;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
     gap: 14px;
     align-items: center;
+}
+
+.rd-provider > div {
+    min-width: 0;
 }
 
 .rd-provider__num {
@@ -342,6 +358,7 @@
     font-size: 1rem;
     letter-spacing: -.005em;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
 }
 
 .rd-provider__meta {
@@ -361,6 +378,15 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Booster-timing rows render provider names and <Code> error blocks inside
+   .rd-provider — keep long strings from forcing horizontal overflow. */
+.rd-provider p,
+.rd-provider code {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .rd-provider__ms {
@@ -696,6 +722,7 @@
     margin: 24px 32px;
     background: var(--fg-ink-2);
     border-left: 4px solid var(--fg-violet);
+    min-width: 0;
 }
 
 .ai-card__head {
@@ -729,7 +756,12 @@
     font-size: .8125rem;
     line-height: 1.65;
     color: var(--fg-paper);
+    /* pre-wrap keeps the newlines/bullets the enrichers emit; overflow-wrap +
+       word-break make long unbreakable tokens (URLs, hashtags) wrap instead of
+       forcing the card past the viewport edge on phone widths. */
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .ai-card__foot {
