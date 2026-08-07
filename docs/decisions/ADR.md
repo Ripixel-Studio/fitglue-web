@@ -280,3 +280,47 @@ const [user, setUser] = useAtom(userAtom);
 ### Consequences
 - **Pros**: Simple API, minimal code, good TypeScript support
 - **Cons**: Less common than Redux, fewer tutorials
+
+## 011 - Firestore Indexes Owned by Server Terraform (2026-08)
+
+### Context
+`useRealtimeInputs` queries `users/{uid}/pending_inputs` with `where('status')` +
+`orderBy('created_at', 'desc')`, which needs a composite index. A production
+`FirebaseError: The query requires an index` (Sentry WEB-APP-1) prompted an earlier
+fix that added `firestore.indexes.json` here and set `firebase deploy --only
+hosting,firestore` to provision it. That deploy started 403ing on `main`: the web
+deploy runs as `circleci-web-deployer`, which holds `firebaserules.admin` (rules)
+but **no** `datastore.*` role, so it cannot create Firestore indexes.
+
+A follow-up tried to grant `roles/datastore.indexAdmin` in
+`scripts/setup_web_deployer.sh`, but that script is a manual bootstrap that CI never
+runs, and the SA's live IAM is actually managed by fitglue-server's
+`terraform/iam.tf` — so the grant never took effect and `main` stayed red.
+
+Crucially, fitglue-server terraform **already declares this exact index**
+(`terraform/firestore.tf` → `pending_inputs_subcollection_status_created`,
+COLLECTION scope, `status` ASC + `created_at` DESC) and applies it live via the
+privileged `circleci-deployer`. The index was already provisioned; the web repo was
+duplicating ownership and hitting a permission wall doing so.
+
+### Decision
+Firestore **indexes** are owned exclusively by fitglue-server terraform. The web repo
+deploys **hosting + Firestore rules only** (`firebase deploy --only
+hosting,firestore:rules`). This repo carries no `firestore.indexes.json` and no
+`indexes` key in `firebase.json`. The web deployer keeps `firebaserules.admin` and no
+`datastore.*` role — restoring the least-privilege boundary from ADR 002.
+
+### Rationale
+- Single owner for indexes (terraform) — no dual reconciliation that could fight
+  (e.g. a web deploy deleting a terraform-managed index absent from a JSON file).
+- Matches the deliberate IAM split: web = hosting + rules, server = Firestore infra.
+- No coverage lost: the `pending_inputs` index is live in dev and prod via server
+  terraform, so `useRealtimeInputs` (and the Sentry WEB-APP-1 query it guards) works.
+
+### Consequences
+- **Pros**: Correct ownership, no 403, least privilege preserved, no code duplication.
+- **Cons**: A new index needed by a web query must be added in fitglue-server
+  terraform and applied before the query ships — a cross-repo coordination step.
+- Supersedes the index-in-web approach; the guard test
+  `src/app/hooks/__tests__/firestoreIndexes.test.ts` now asserts indexes are **not**
+  managed here, so the regression can't silently return.

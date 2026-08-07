@@ -81,17 +81,12 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --role="roles/storage.objectAdmin" \
   --condition=None
 
-# Grant Cloud Datastore Index Admin (for firestore.indexes.json)
-# `firebase deploy --only ...,firestore` provisions composite indexes. Creating a
-# NEW index calls firestore.googleapis.com .../indexes, which needs
-# datastore.indexes.create — not included in Firebase Hosting Admin. Without this
-# role the deploy 403s the first time a non-empty index set must be created
-# (an empty index set is a no-op and hides the gap). See firestore.indexes.json.
-echo "🔐 Granting Firestore index permissions..."
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/datastore.indexAdmin" \
-  --condition=None
+# NOTE: The web deployer intentionally has NO datastore.* role. Firestore indexes
+# are owned by fitglue-server terraform (ADR 011); the web deploy runs
+# `firebase deploy --only hosting,firestore:rules`, which touches rules only.
+# Rules deployment needs roles/firebaserules.admin, which is granted to this SA by
+# fitglue-server's terraform/iam.tf (the authoritative source for this SA's IAM),
+# not by this script.
 
 echo "Permissions granted"
 
@@ -142,7 +137,7 @@ echo ""
 echo "📋 Configuration Summary:"
 echo "  Workload Identity Pool: projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME (shared with server)"
 echo "  Service Account: $SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
-echo "  Permissions: Firebase Hosting Admin, Storage Object Admin, Cloud Datastore Index Admin"
+echo "  Permissions: Firebase Hosting Admin, Storage Object Admin"
 echo ""
 echo "🔄 Next steps:"
 echo "  1. Repeat for other environments: ./scripts/setup_web_deployer.sh test"

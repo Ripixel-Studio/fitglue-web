@@ -186,7 +186,10 @@ jobs:
             export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json
             # Deploy to Firebase Hosting
             # Note: Site must be created first (done by bootstrap script)
-            firebase deploy --only hosting,firestore --project fitglue-server-<< parameters.target >> --non-interactive --force
+            # firestore:rules only — Firestore indexes are owned by fitglue-server
+            # terraform (ADR 011). Deploying indexes from here 403s: the web deployer
+            # holds firebaserules.admin but deliberately no datastore.* role.
+            firebase deploy --only hosting,firestore:rules --project fitglue-server-<< parameters.target >> --non-interactive --force
 
   firebase-preview:
     executor: node-executor
