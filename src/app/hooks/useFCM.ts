@@ -9,6 +9,19 @@ import { logger } from '../../shared/logger';
 const FIREBASE_VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
 /**
+ * Whether the Notification API is available in this environment.
+ *
+ * `Notification` is a bare global, so referencing it directly on a platform that
+ * does not provide it (iOS Safari < 16.4, and many native WebViews — including the
+ * ReactNativeWebView shell this app is embedded in) throws
+ * `ReferenceError: Notification is not defined` rather than returning undefined.
+ * `getMessaging()` returning a Messaging instance does NOT guarantee the global
+ * exists, so every use of `Notification` must be guarded by this check first.
+ */
+const isNotificationSupported = (): boolean =>
+  typeof window !== 'undefined' && 'Notification' in window;
+
+/**
  * Custom hook that manages Firebase Cloud Messaging (FCM) for push notifications.
  * 
  * Handles:
@@ -47,6 +60,14 @@ export function useFCM() {
         return;
       }
 
+      // Some environments (older iOS Safari, native WebViews) can create a
+      // Messaging instance yet still lack the Notification global. Bail out
+      // before touching it to avoid a ReferenceError.
+      if (!isNotificationSupported()) {
+        console.warn('[useFCM] Notifications are not supported in this environment');
+        return;
+      }
+
       // Register service worker first
       const swRegistration = await registerServiceWorker();
 
@@ -78,7 +99,7 @@ export function useFCM() {
       const unsubscribe = onMessage(messaging, (payload) => {
         console.log('[useFCM] Foreground message received:', payload);
 
-        if (payload.notification) {
+        if (payload.notification && isNotificationSupported()) {
           const notificationType = payload.data?.type;
           const activityId = payload.data?.activity_id;
           const sourceId = payload.data?.sourceId;
