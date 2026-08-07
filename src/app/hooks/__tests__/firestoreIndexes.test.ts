@@ -1,18 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 /**
- * Guards the Firestore composite-index contract.
+ * Guards the Firestore index ownership boundary.
  *
  * `useRealtimeInputs` runs an equality filter on `status` combined with an
- * `orderBy('created_at', 'desc')` against `users/{uid}/pending_inputs`. Firestore
- * requires an explicit composite index for that combination; without it the
- * onSnapshot listener fails in production with a `FirebaseError`
- * ("The query requires an index") that surfaced on the dashboard (Sentry WEB-APP-1).
+ * `orderBy('created_at', 'desc')` against `users/{uid}/pending_inputs`, which
+ * requires a composite index. That index is NOT owned here — it is declared and
+ * provisioned by fitglue-server terraform
+ * (`terraform/firestore.tf` → `pending_inputs_subcollection_status_created`,
+ * COLLECTION scope, status ASC + created_at DESC), applied by the privileged
+ * `circleci-deployer` service account.
  *
- * These tests fail if the index is not declared, or if `firebase.json` does not
- * point at the indexes file (so `firebase deploy` never provisions it).
+ * The web deploy runs `firebase deploy --only hosting,firestore:rules` as
+ * `circleci-web-deployer`, which holds `firebaserules.admin` but deliberately no
+ * `datastore.*` role. If this repo ever re-introduces `firestore.indexes.json` or
+ * an `indexes` key in `firebase.json`, the Firebase CLI would call the Firestore
+ * indexes API during deploy and 403 — which is exactly the regression that took
+ * `main` red before (see ADR 011). These tests fail loudly if that happens again.
  */
 
 const repoRoot = resolve(__dirname, '../../../..');
@@ -20,38 +26,28 @@ const repoRoot = resolve(__dirname, '../../../..');
 const readJson = (relativePath: string): Record<string, unknown> =>
   JSON.parse(readFileSync(resolve(repoRoot, relativePath), 'utf-8'));
 
-interface IndexField {
-  fieldPath: string;
-  order?: string;
-  arrayConfig?: string;
-}
-interface CompositeIndex {
-  collectionGroup: string;
-  queryScope: string;
-  fields: IndexField[];
-}
-
-describe('Firestore composite indexes', () => {
-  it('declares the pending_inputs (status + created_at desc) index required by useRealtimeInputs', () => {
-    const config = readJson('firestore.indexes.json');
-    const indexes = (config.indexes ?? []) as CompositeIndex[];
-
-    const match = indexes.find(
-      (index) =>
-        index.collectionGroup === 'pending_inputs' &&
-        index.fields.some((f) => f.fieldPath === 'status') &&
-        index.fields.some((f) => f.fieldPath === 'created_at' && f.order === 'DESCENDING'),
-    );
-
+describe('Firestore index ownership', () => {
+  it('does not ship a firestore.indexes.json (indexes are owned by fitglue-server terraform)', () => {
     expect(
-      match,
-      'Missing composite index for pending_inputs (status ASC, created_at DESC) — the dashboard listener will throw FirebaseError in production',
-    ).toBeDefined();
+      existsSync(resolve(repoRoot, 'firestore.indexes.json')),
+      'firestore.indexes.json must not exist here — Firestore indexes are owned by ' +
+        'fitglue-server terraform. Deploying indexes from the web repo 403s because ' +
+        'circleci-web-deployer has no datastore.* role (ADR 011).',
+    ).toBe(false);
   });
 
-  it('wires the indexes file into firebase.json so it gets deployed', () => {
+  it('does not wire an indexes file into firebase.json', () => {
     const firebaseConfig = readJson('firebase.json');
-    const firestore = firebaseConfig.firestore as { indexes?: string } | undefined;
-    expect(firestore?.indexes).toBe('firestore.indexes.json');
+    const firestore = firebaseConfig.firestore as
+      | { rules?: string; indexes?: string }
+      | undefined;
+
+    // Rules stay here; indexes must not.
+    expect(firestore?.rules).toBe('firestore.rules');
+    expect(
+      firestore?.indexes,
+      "firebase.json must not reference an indexes file — the web deploy is " +
+        "--only hosting,firestore:rules; indexes live in fitglue-server terraform (ADR 011).",
+    ).toBeUndefined();
   });
 });

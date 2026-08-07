@@ -49,7 +49,11 @@ For each environment, the script:
 4. **Grants IAM roles**
    - `roles/firebasehosting.admin` - Deploy to Firebase Hosting
    - `roles/storage.objectAdmin` - Upload hosting files
-   - `roles/datastore.indexAdmin` - Provision Firestore composite indexes from `firestore.indexes.json` (the web deploy runs `firebase deploy --only hosting,firestore`)
+
+   Firestore **rules** deployment (`firebase deploy --only hosting,firestore:rules`)
+   needs `roles/firebaserules.admin`, which is granted to this SA by fitglue-server's
+   `terraform/iam.tf`, not this script. Firestore **indexes** are owned by
+   fitglue-server terraform (ADR 011), so the web deployer has no `datastore.*` role.
 
 5. **Configures workload identity bindings**
    - `roles/iam.workloadIdentityUser` - Allow OIDC impersonation
