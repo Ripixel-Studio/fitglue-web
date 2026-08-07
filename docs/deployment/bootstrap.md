@@ -49,6 +49,7 @@ For each environment, the script:
 4. **Grants IAM roles**
    - `roles/firebasehosting.admin` - Deploy to Firebase Hosting
    - `roles/storage.objectAdmin` - Upload hosting files
+   - `roles/datastore.indexAdmin` - Provision Firestore composite indexes from `firestore.indexes.json` (the web deploy runs `firebase deploy --only hosting,firestore`)
 
 5. **Configures workload identity bindings**
    - `roles/iam.workloadIdentityUser` - Allow OIDC impersonation
