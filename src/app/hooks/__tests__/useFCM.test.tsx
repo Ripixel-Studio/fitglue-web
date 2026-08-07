@@ -28,6 +28,7 @@ vi.mock('../../services/InputsService', () => ({
 }));
 vi.mock('../../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn() } }));
 
+import { logger } from '../../../shared/logger';
 import { useFCM } from '../useFCM';
 import { userAtom } from '../../state/authState';
 
@@ -91,5 +92,37 @@ describe('useFCM', () => {
     // give microtasks a chance
     await Promise.resolve();
     expect(state.getToken).not.toHaveBeenCalled();
+  });
+
+  // Regression for WEB-APP-2: on platforms without the Notification global
+  // (iOS Safari < 16.4, native WebViews) `getMessaging()` can still return a
+  // Messaging instance, so setup reaches the bare `Notification.requestPermission()`
+  // call and throws `ReferenceError: Notification is not defined`.
+  describe('when the Notification global is absent', () => {
+    beforeEach(() => {
+      // Simulate an environment that supports messaging but not Notifications.
+      delete (globalThis as { Notification?: unknown }).Notification;
+      state.messaging = {};
+    });
+
+    it('does not touch Notification (no ReferenceError, no error report)', async () => {
+      renderHook(() => useFCM(), { wrapper: makeWrapper({ uid: 'u1' }) });
+      await Promise.resolve();
+      await Promise.resolve();
+      // Must skip gracefully rather than crash into the catch + Sentry report.
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(state.getToken).not.toHaveBeenCalled();
+    });
+
+    it('does not construct a Notification for foreground messages', async () => {
+      renderHook(() => useFCM(), { wrapper: makeWrapper({ uid: 'u1' }) });
+      await waitFor(() => expect(state.onMessageCb).toBeDefined());
+      expect(() =>
+        state.onMessageCb?.({
+          notification: { title: 'Hello', body: 'World' },
+          data: { type: 'PENDING_INPUT', activity_id: 'act-1' },
+        })
+      ).not.toThrow();
+    });
   });
 });
