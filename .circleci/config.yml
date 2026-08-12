@@ -59,18 +59,24 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - gcloud-sdk-alpine-v1
       - run:
           name: Authenticate with GCP via OIDC
           command: |
             PROJECT_ID="fitglue-server-<< parameters.target >>"
             PROJECT_NUMBER="<< parameters.project_number >>"
 
-            # Download and install gcloud SDK
+            # Install gcloud SDK into ~ unless the cache already has it.
+            # Bump the gcloud-sdk-alpine-vN cache key to pick up a newer SDK.
             apk add --no-cache python3 py3-pip curl bash
-            curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
-            tar -xf google-cloud-cli-linux-x86_64.tar.gz
-            ./google-cloud-sdk/install.sh --quiet
-            export PATH=$PATH:$(pwd)/google-cloud-sdk/bin
+            if [ ! -d ~/google-cloud-sdk ]; then
+              curl -sO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+              tar -xf google-cloud-cli-linux-x86_64.tar.gz -C ~
+              ~/google-cloud-sdk/install.sh --quiet
+            fi
+            export PATH=$PATH:$HOME/google-cloud-sdk/bin
 
             # Store OIDC token
             echo $CIRCLE_OIDC_TOKEN > /tmp/oidc_token.txt
@@ -87,7 +93,11 @@ jobs:
 
             # Set credentials for terraform
             echo "export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_cred_config.json" >> $BASH_ENV
-            echo "export PATH=\$PATH:$(pwd)/google-cloud-sdk/bin" >> $BASH_ENV
+            echo "export PATH=\$PATH:$HOME/google-cloud-sdk/bin" >> $BASH_ENV
+      - save_cache:
+          key: gcloud-sdk-alpine-v1
+          paths:
+            - ~/google-cloud-sdk
       - run:
           name: Terraform Init
           command: |
@@ -109,13 +119,23 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - gcloud-sdk-node-v1
       - run:
-          name: Install gcloud SDK
+          name: Install gcloud SDK (cached)
           command: |
-            curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
-            tar -xf google-cloud-cli-linux-x86_64.tar.gz
-            ./google-cloud-sdk/install.sh --quiet
-            echo "export PATH=\$PATH:$(pwd)/google-cloud-sdk/bin" >> $BASH_ENV
+            # Bump the gcloud-sdk-node-vN cache key to pick up a newer SDK.
+            if [ ! -d ~/google-cloud-sdk ]; then
+              curl -sO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+              tar -xf google-cloud-cli-linux-x86_64.tar.gz -C ~
+              ~/google-cloud-sdk/install.sh --quiet
+            fi
+            echo "export PATH=\$PATH:$HOME/google-cloud-sdk/bin" >> $BASH_ENV
+      - save_cache:
+          key: gcloud-sdk-node-v1
+          paths:
+            - ~/google-cloud-sdk
       - run:
           name: Authenticate with GCP via OIDC
           command: |
@@ -196,13 +216,23 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - gcloud-sdk-node-v1
       - run:
-          name: Install gcloud SDK
+          name: Install gcloud SDK (cached)
           command: |
-            curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
-            tar -xf google-cloud-cli-linux-x86_64.tar.gz
-            ./google-cloud-sdk/install.sh --quiet
-            echo "export PATH=\$PATH:$(pwd)/google-cloud-sdk/bin" >> $BASH_ENV
+            # Bump the gcloud-sdk-node-vN cache key to pick up a newer SDK.
+            if [ ! -d ~/google-cloud-sdk ]; then
+              curl -sO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+              tar -xf google-cloud-cli-linux-x86_64.tar.gz -C ~
+              ~/google-cloud-sdk/install.sh --quiet
+            fi
+            echo "export PATH=\$PATH:$HOME/google-cloud-sdk/bin" >> $BASH_ENV
+      - save_cache:
+          key: gcloud-sdk-node-v1
+          paths:
+            - ~/google-cloud-sdk
       - run:
           name: Authenticate with GCP via OIDC (dev)
           command: |
