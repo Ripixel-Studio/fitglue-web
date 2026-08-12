@@ -234,12 +234,12 @@ jobs:
           paths:
             - ~/google-cloud-sdk
       - run:
-          name: Authenticate with GCP via OIDC (dev)
+          name: Authenticate with GCP via OIDC (prod)
           command: |
             echo $CIRCLE_OIDC_TOKEN > /tmp/oidc_token.txt
             gcloud iam workload-identity-pools create-cred-config \
-              "projects/911679924866/locations/global/workloadIdentityPools/circleci-pool/providers/circleci-provider" \
-              --service-account=circleci-web-deployer@fitglue-server-dev.iam.gserviceaccount.com \
+              "projects/605889586984/locations/global/workloadIdentityPools/circleci-pool/providers/circleci-provider" \
+              --service-account=circleci-web-deployer@fitglue-server-prod.iam.gserviceaccount.com \
               --output-file=/tmp/gcp_cred_config.json \
               --credential-source-file=/tmp/oidc_token.txt
             gcloud auth login --brief --cred-file=/tmp/gcp_cred_config.json
@@ -252,11 +252,11 @@ jobs:
             SERVER_VERSION=$(gcloud storage cat gs://fitglue-server-prod-version-config/version.json 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version" || echo "0.0.0")
             echo "VITE_APP_VERSION=vS${SERVER_VERSION}-W${WEB_VERSION}" >> .env
       - run:
-          name: Build for Dev Environment
+          name: Build for Preview (prod registry)
           command: |
             mkdir -p .cache
             cp data/registry-snapshot.json .cache/registry.json
-            export REGISTRY_API_URL="https://dev.fitglue.tech/api/v2/registry"
+            export REGISTRY_API_URL="https://fitglue.tech/api/v2/registry"
             npm run build:dev
       - run:
           name: Configure Robots.txt
@@ -273,11 +273,11 @@ jobs:
             CHANNEL_ID=${CHANNEL_ID:-"preview"}
             echo "Deploying preview channel: $CHANNEL_ID"
             firebase hosting:channel:deploy "$CHANNEL_ID" \
-              --project fitglue-server-dev \
+              --project fitglue-server-prod \
               --expires 7d \
               --non-interactive
             echo ""
-            echo "Preview URL: https://fitglue-server-dev--${CHANNEL_ID}.web.app"
+            echo "Preview URL: https://fitglue-server-prod--${CHANNEL_ID}.web.app"
 
   create-release:
     executor: node-executor
@@ -352,24 +352,6 @@ workflows:
             branches:
               ignore: main
       - terraform-apply:
-          name: terraform-apply-dev
-          target: dev
-          project_number: "911679924866"
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only: main
-      - firebase-deploy:
-          name: firebase-deploy-dev
-          target: dev
-          project_number: "911679924866"
-          requires:
-            - terraform-apply-dev
-          filters:
-            branches:
-              only: main
-      - terraform-apply:
           name: terraform-apply-prod
           target: prod
           project_number: "605889586984"
@@ -393,13 +375,6 @@ workflows:
     when: << pipeline.parameters.triggered_by_server >>
     jobs:
       - build-and-test
-      - firebase-deploy:
-          name: firebase-deploy-dev
-          target: dev
-          project_number: "911679924866"
-          requires:
-            - build-and-test
-
       - firebase-deploy:
           name: firebase-deploy-prod
           target: prod
