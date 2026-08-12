@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.94.11](https://github.com/fitglue/web/compare/v11.94.10...v11.94.11) (2026-08-12)
+
 ### [11.94.10](https://github.com/fitglue/web/compare/v11.94.9...v11.94.10) (2026-08-12)
 
 ### [11.94.9](https://github.com/fitglue/web/compare/v11.94.8...v11.94.9) (2026-08-07)
