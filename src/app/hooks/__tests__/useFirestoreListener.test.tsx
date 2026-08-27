@@ -115,6 +115,34 @@ describe('useFirestoreListener', () => {
     expect(state.unsub).toHaveBeenCalled();
   });
 
+  it('contains a mapper throw on cached data for a late subscriber (no ErrorBoundary crash)', () => {
+    const key = nextKey();
+
+    // First consumer establishes the listener and caches a snapshot.
+    const first = renderHook(() => useFirestoreListener({ listenerKey: key, queryFactory, mapper }));
+    act(() => state.onNext?.({ value: 7 }));
+    expect(first.result.current.data).toBe(7);
+
+    // A second consumer of the same key maps the *cached* snapshot immediately on
+    // mount, inside its effect. If that mapper throws on the document shape, the
+    // failure must stay contained — logged, no data — rather than propagating out
+    // of the effect where React would hand it to the app-wide ErrorBoundary and
+    // blank the /app route (Sentry WEB-APP-3).
+    const throwingMapper = (): number => { throw new Error('unexpected document shape'); };
+    let secondData: number | null = 0;
+    expect(() => {
+      const second = renderHook(() =>
+        useFirestoreListener({ listenerKey: key, queryFactory, mapper: throwingMapper }),
+      );
+      secondData = second.result.current.data;
+    }).not.toThrow();
+
+    // Contained: the late subscriber simply has no data, and the shared listener
+    // keeps serving the first consumer.
+    expect(secondData ?? null).toBeNull();
+    expect(first.result.current.data).toBe(7);
+  });
+
   it('refresh() re-creates the listener', () => {
     const key = nextKey();
     const { result } = renderHook(() =>

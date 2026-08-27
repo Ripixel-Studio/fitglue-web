@@ -129,9 +129,22 @@ export function useFirestoreListener<TData>(
 
             // Use existing data immediately
             if (existingEntry.latestData !== undefined) {
-                const mappedData = mapperRef.current(existingEntry.latestData);
-                setData(mappedData);
-                onDataRef.current?.(mappedData);
+                // Mapping cached data can throw on an unexpected document shape.
+                // The primary snapshot path swallows exactly this failure (see the
+                // callback loop that wraps every `cb(snapshot)` in try/catch below),
+                // so a single bad document only degrades that one listener. This
+                // reuse path runs synchronously inside the effect, so an unguarded
+                // throw here escapes into React's commit phase and is caught by the
+                // app-wide ErrorBoundary — blanking the whole /app route for a
+                // late/returning subscriber to a shared listener. Guard it the same
+                // way so the failure stays contained and logged (Sentry) instead.
+                try {
+                    const mappedData = mapperRef.current(existingEntry.latestData);
+                    setData(mappedData);
+                    onDataRef.current?.(mappedData);
+                } catch (err) {
+                    logger.error('[useFirestoreListener] Failed to map cached data:', err);
+                }
             }
             setIsListening(existingEntry.isListening);
             setError(existingEntry.error);
