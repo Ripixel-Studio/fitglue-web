@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ShowcaseProfilePage from '../ShowcaseProfilePage';
 import publicClient from '../../../shared/api/public-client';
@@ -77,6 +77,29 @@ function Wrapper() {
   );
 }
 
+// Controllable IntersectionObserver so we can drive auto-load-on-scroll in
+// jsdom (which ships no real implementation).
+class FakeIO {
+  static instances: FakeIO[] = [];
+  cb: IntersectionObserverCallback;
+  observed: Element[] = [];
+  disconnected = false;
+  constructor(cb: IntersectionObserverCallback) {
+    this.cb = cb;
+    FakeIO.instances.push(this);
+  }
+  observe(el: Element) { this.observed.push(el); }
+  disconnect() { this.disconnected = true; }
+  unobserve() {}
+  takeRecords() { return []; }
+  triggerAll() {
+    for (const io of FakeIO.instances) {
+      if (io.disconnected) continue;
+      io.cb([{ isIntersecting: true } as IntersectionObserverEntry], io as unknown as IntersectionObserver);
+    }
+  }
+}
+
 describe('ShowcaseProfilePage', () => {
   it('shows 12 roundups initially and appends more via "load more"', async () => {
     render(<Wrapper />);
@@ -114,5 +137,48 @@ describe('ShowcaseProfilePage', () => {
     await waitFor(() => expect(screen.getAllByText('WEEKLY ROUNDUP')).toHaveLength(40));
 
     expect(screen.queryByText('Load more roundups →')).not.toBeInTheDocument();
+  });
+
+  describe('infinite scroll', () => {
+    beforeEach(() => {
+      FakeIO.instances = [];
+      vi.stubGlobal('IntersectionObserver', FakeIO as unknown as typeof IntersectionObserver);
+    });
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('auto-loads the next roundup page when the sentinel scrolls into view', async () => {
+      render(<Wrapper />);
+      expect(await screen.findByText('Load more roundups →')).toBeInTheDocument();
+      expect(screen.getAllByText('WEEKLY ROUNDUP')).toHaveLength(12);
+
+      // Scrolling the sentinel into view fetches page 2 without any click.
+      act(() => FakeIO.instances.forEach((io) => io.triggerAll()));
+      await waitFor(() => expect(screen.getAllByText('WEEKLY ROUNDUP')).toHaveLength(24));
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pages = (publicClient.GET as any).mock.calls
+        .filter((c: unknown[]) => c[0] === '/showcase/{slug}/roundups/recent')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((c: any) => c[1]?.params?.query?.page);
+      expect(pages).toContain(2);
+    });
+
+    it('shows a retry affordance when a roundup page fetch fails, and no infinite spinner', async () => {
+      render(<Wrapper />);
+      // Wait for the initial page-1 fetch to settle (button implies more pages).
+      const btn = await screen.findByText('Load more roundups →');
+
+      // Make the NEXT fetch (page 2, triggered by the load) reject.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (publicClient.GET as any).mockImplementationOnce(() => Promise.reject(new Error('network')));
+      fireEvent.click(btn);
+
+      expect(await screen.findByText(/Couldn’t load more roundups/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+      // No stuck loading indicator once the fetch settled.
+      expect(screen.queryByText('Loading more roundups…')).not.toBeInTheDocument();
+    });
   });
 });

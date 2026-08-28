@@ -12,6 +12,7 @@ import ActivityGrid from '../components/layout/ActivityGrid';
 import { PhotoGallery } from '../components/PhotoGallery';
 import { useShowcaseMeta } from '../utils/useShowcaseMeta';
 import { useShowcaseOwner } from '../utils/useShowcaseOwner';
+import { useInfiniteScroll } from '../utils/useInfiniteScroll';
 import { recordShowcaseView } from '../utils/recordView';
 import { roundupTypeClass } from '../utils/roundup';
 import ShowcaseNotFound from '../components/ShowcaseNotFound';
@@ -89,7 +90,9 @@ export default function ShowcaseProfilePage() {
   const [roundupPage, setRoundupPage] = useState(1);
   const [roundupTotalPages, setRoundupTotalPages] = useState(1);
   const [loadingMoreRoundups, setLoadingMoreRoundups] = useState(false);
+  const [roundupError, setRoundupError] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [feedError, setFeedError] = useState(false);
   const [error, setError] = useState(false);
   const { isOwner, resolved: ownershipResolved } = useShowcaseOwner(slug);
   const [viewStats, setViewStats] = useState<clientComponents['schemas']['ShowcaseViewStats'] | null>(null);
@@ -110,7 +113,8 @@ export default function ShowcaseProfilePage() {
   }, [slug]);
 
   // Roundups page 1 loads with the rest of the profile; subsequent pages are
-  // appended via "load more", mirroring the activity feed's pagination below.
+  // appended via infinite scroll (see loadMoreRoundups), mirroring the activity
+  // feed's pagination below.
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
@@ -157,6 +161,7 @@ export default function ShowcaseProfilePage() {
   const loadMoreRoundups = useCallback(async () => {
     if (!slug || loadingMoreRoundups || roundupPage >= roundupTotalPages) return;
     setLoadingMoreRoundups(true);
+    setRoundupError(false);
     try {
       const nextPage = roundupPage + 1;
       const { data } = await publicClient.GET('/showcase/{slug}/roundups/recent', {
@@ -167,6 +172,9 @@ export default function ShowcaseProfilePage() {
         setRoundupPage(data.currentPage ?? nextPage);
         setRoundupTotalPages(data.totalPages ?? roundupTotalPages);
       }
+    } catch {
+      // Surface a retry affordance; the observer stops until the user retries.
+      setRoundupError(true);
     } finally {
       setLoadingMoreRoundups(false);
     }
@@ -175,6 +183,7 @@ export default function ShowcaseProfilePage() {
   const loadMore = useCallback(async () => {
     if (!slug || loadingMore || currentPage >= totalPages) return;
     setLoadingMore(true);
+    setFeedError(false);
     try {
       const nextPage = currentPage + 1;
       const { data } = await publicClient.GET('/showcase/profile/{slug}', {
@@ -185,15 +194,34 @@ export default function ShowcaseProfilePage() {
         setCurrentPage(data.currentPage ?? nextPage);
         setTotalPages(data.totalPages ?? totalPages);
       }
+    } catch {
+      // Surface a retry affordance; the observer stops until the user retries.
+      setFeedError(true);
     } finally {
       setLoadingMore(false);
     }
   }, [slug, currentPage, totalPages, loadingMore]);
 
+  const hasMore = currentPage < totalPages;
+  const hasMoreRoundups = roundupPage < roundupTotalPages;
+
+  // Auto-load each section as its sentinel scrolls into view. While an error is
+  // showing we pass hasMore=false so the observer disconnects instead of
+  // hammering a failing endpoint — the visible Retry button re-drives it.
+  const feedSentinelRef = useInfiniteScroll<HTMLDivElement>({
+    hasMore: hasMore && !feedError,
+    loading: loadingMore,
+    onLoadMore: loadMore,
+  });
+  const roundupSentinelRef = useInfiniteScroll<HTMLDivElement>({
+    hasMore: hasMoreRoundups && !roundupError,
+    loading: loadingMoreRoundups,
+    onLoadMore: loadMoreRoundups,
+  });
+
   if (loading) return <LoadingScreen />;
   if (error || !profile) return <ShowcaseNotFound type="profile" />;
 
-  const hasMore = currentPage < totalPages;
   const links = (profile.links ?? []).filter((l: ShowcaseLink) => l.url);
   const callouts = (profile.callouts ?? []).filter((c) => c.text);
 
@@ -282,27 +310,48 @@ export default function ShowcaseProfilePage() {
                   </Link>
                 );
               })}
+              {/* Auto-load sentinel — clipped by the strip's overflow until the
+                  user scrolls to its right edge, so pages load on demand. */}
+              {hasMoreRoundups && !roundupError && (
+                <div ref={roundupSentinelRef} className="infinite-sentinel" aria-hidden="true" />
+              )}
             </div>
-            {roundupPage < roundupTotalPages && (
+            {(hasMoreRoundups || loadingMoreRoundups) && (
               <div className="roundup-profile-band__more">
-                <button
-                  onClick={loadMoreRoundups}
-                  disabled={loadingMoreRoundups}
-                  style={{
-                    fontFamily: 'var(--fg-font-mono)',
-                    fontSize: '0.75rem',
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: loadingMoreRoundups ? 'var(--color-text-muted)' : 'var(--fg-paper)',
-                    background: 'none',
-                    border: '1px solid var(--color-border, rgba(255,255,255,0.15))',
-                    borderRadius: 6,
-                    padding: '8px 18px',
-                    cursor: loadingMoreRoundups ? 'default' : 'pointer',
-                  }}
-                >
-                  {loadingMoreRoundups ? 'Loading…' : 'Load more roundups →'}
-                </button>
+                {loadingMoreRoundups ? (
+                  <span className="infinite-status" role="status" aria-live="polite">
+                    <span className="infinite-spinner" aria-hidden="true" />
+                    Loading more roundups…
+                  </span>
+                ) : roundupError ? (
+                  <span className="infinite-status infinite-status--error" role="alert">
+                    Couldn’t load more roundups.{' '}
+                    <button type="button" className="infinite-retry" onClick={loadMoreRoundups}>
+                      Retry
+                    </button>
+                  </span>
+                ) : (
+                  // Fallback for no-JS / keyboard / browsers without
+                  // IntersectionObserver — the observer normally loads first.
+                  <button
+                    onClick={loadMoreRoundups}
+                    className="infinite-more-btn"
+                    style={{
+                      fontFamily: 'var(--fg-font-mono)',
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: 'var(--fg-paper)',
+                      background: 'none',
+                      border: '1px solid var(--color-border, rgba(255,255,255,0.15))',
+                      borderRadius: 6,
+                      padding: '8px 18px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Load more roundups →
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -337,30 +386,54 @@ export default function ShowcaseProfilePage() {
               profileSlug={slug!}
             />
 
-            {/* Pagination */}
+            {/* Auto-load sentinel — sits just below the grid so the next page
+                fetches as the user nears the bottom of the feed. */}
+            {hasMore && !feedError && (
+              <div ref={feedSentinelRef} className="infinite-sentinel" aria-hidden="true" />
+            )}
+
+            {/* Pagination status */}
             {(hasMore || currentPage > 1) && (
               <div className="profile-pagi">
                 <span className="profile-pagi__info" style={{ fontFamily: 'var(--fg-font-mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
                   Page {currentPage} of {totalPages}
                 </span>
-                {hasMore && (
+                {loadingMore ? (
+                  <span className="infinite-status" role="status" aria-live="polite">
+                    <span className="infinite-spinner" aria-hidden="true" />
+                    Loading more…
+                  </span>
+                ) : feedError ? (
+                  <span className="infinite-status infinite-status--error" role="alert">
+                    Couldn’t load more.{' '}
+                    <button type="button" className="infinite-retry" onClick={loadMore}>
+                      Retry
+                    </button>
+                  </span>
+                ) : hasMore ? (
+                  // Fallback for no-JS / keyboard / browsers without
+                  // IntersectionObserver — the observer normally loads first.
                   <button
                     onClick={loadMore}
-                    disabled={loadingMore}
+                    className="infinite-more-btn"
                     style={{
                       fontFamily: 'var(--fg-font-mono)',
                       fontSize: '0.75rem',
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
-                      color: loadingMore ? 'var(--color-text-muted)' : 'var(--fg-paper)',
+                      color: 'var(--fg-paper)',
                       background: 'none',
                       border: 'none',
-                      cursor: loadingMore ? 'default' : 'pointer',
+                      cursor: 'pointer',
                       padding: 0,
                     }}
                   >
-                    {loadingMore ? 'Loading…' : 'NEXT →'}
+                    NEXT →
                   </button>
+                ) : (
+                  <span className="profile-pagi__info" style={{ fontFamily: 'var(--fg-font-mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                    That’s all ✨
+                  </span>
                 )}
               </div>
             )}
