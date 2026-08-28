@@ -2569,6 +2569,62 @@ body:has(#showcase-root) {
   border-top: var(--fg-rule-thin);
 }
 
+/* ---- Infinite scroll (roundups band + activity feed) ---- */
+/* Zero-footprint marker the IntersectionObserver watches. In the horizontal
+   roundup strip it is a flex item at the far end; below the activity grid it is
+   a full-width row. Either way it is invisible and non-interactive. */
+.infinite-sentinel {
+  flex: 0 0 1px;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.infinite-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fg-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.infinite-status--error {
+  color: var(--fg-pink, #ff3da6);
+}
+
+.infinite-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .infinite-spinner { animation: fg-infinite-spin 0.7s linear infinite; }
+}
+
+@keyframes fg-infinite-spin {
+  to { transform: rotate(360deg); }
+}
+
+.infinite-retry {
+  font-family: var(--fg-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-paper);
+  background: none;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.15));
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
 /* ---- Bio sidebar ---- */
 .profile-bio {
   padding: 32px;
