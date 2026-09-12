@@ -43,10 +43,11 @@ interface MagicActionsPopoverProps {
     activity: SynchronizedActivity;
     onSuccess: () => void;
     pendingInputId?: string;
-    isPendingRun?: boolean;
+    /** True when the run is still cancellable (PENDING or RUNNING) — surfaces the "Cancel pipeline" action. */
+    isCancellableRun?: boolean;
 }
 
-export const MagicActionsPopover: React.FC<MagicActionsPopoverProps> = ({ activity, onSuccess, pendingInputId, isPendingRun }) => {
+export const MagicActionsPopover: React.FC<MagicActionsPopoverProps> = ({ activity, onSuccess, pendingInputId, isCancellableRun }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [modalType, setModalType] = useState<ModalType>(null);
     const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
@@ -212,7 +213,7 @@ export const MagicActionsPopover: React.FC<MagicActionsPopoverProps> = ({ activi
                                         >
                                             🔄 Re-run entire pipeline
                                         </button>
-                                        {(isPendingRun || pendingInputId) && (
+                                        {(isCancellableRun || pendingInputId) && (
                                             <button
                                                 type="button"
                                                 className="magic__btn magic__btn--danger"
@@ -273,7 +274,7 @@ export const MagicActionsPopover: React.FC<MagicActionsPopoverProps> = ({ activi
                             <Card variant="elevated">
                                 <Paragraph>⚠️ <Paragraph inline bold>Warning:</Paragraph> This will permanently cancel the pipeline run. The activity will remain in its current state with <Paragraph inline bold>no further processing</Paragraph>.</Paragraph>
                             </Card>
-                            <Paragraph>Use this to kill a run that is stuck waiting for input you no longer wish to provide.</Paragraph>
+                            <Paragraph>Use this to stop a run you started in error — whether it&apos;s still processing or waiting for input — before it uploads to your destinations. Uploads that have already completed are not undone.</Paragraph>
                         </Stack>
                     )}
                     {result && (

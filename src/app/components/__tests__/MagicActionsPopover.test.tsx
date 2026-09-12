@@ -28,4 +28,16 @@ describe('MagicActionsPopover', () => {
     fireEvent.click(trigger);
     expect(screen.getByText(/Advanced/)).toBeInTheDocument();
   });
+
+  it('does not offer Cancel pipeline for a completed run', () => {
+    render(<MagicActionsPopover activity={activity} onSuccess={vi.fn()} />, { wrapper: Wrapper });
+    fireEvent.click(screen.getByText(/MAGIC ACTIONS/));
+    expect(screen.queryByText(/Cancel pipeline/)).not.toBeInTheDocument();
+  });
+
+  it('offers Cancel pipeline for a cancellable (pending or running) run', () => {
+    render(<MagicActionsPopover activity={activity} onSuccess={vi.fn()} isCancellableRun />, { wrapper: Wrapper });
+    fireEvent.click(screen.getByText(/MAGIC ACTIONS/));
+    expect(screen.getByText(/Cancel pipeline/)).toBeInTheDocument();
+  });
 });
