@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.94.15](https://github.com/fitglue/web/compare/v11.94.14...v11.94.15) (2026-09-12)
+
+
+### Bug Fixes
+
+* **firebase:** probe isSupported() before getMessaging to stop unhandled rejection in WebViews ([#13](https://github.com/fitglue/web/issues/13)) ([9a92a48](https://github.com/fitglue/web/commit/9a92a488ae78b286b7e2e2a2b39e9055f57c24c9))
+
 ### [11.94.14](https://github.com/fitglue/web/compare/v11.94.13...v11.94.14) (2026-09-12)
 
 ### [11.94.13](https://github.com/fitglue/web/compare/v11.94.12...v11.94.13) (2026-08-28)
