@@ -81,7 +81,8 @@ const UnsynchronizedDetailPage: React.FC = () => {
                     </div>
                 </div>
                 <div className="rd-head__actions">
-                    {run?.status === PipelineRunStatus.PIPELINE_RUN_STATUS_PENDING && (
+                    {(run?.status === PipelineRunStatus.PIPELINE_RUN_STATUS_PENDING ||
+                        run?.status === PipelineRunStatus.PIPELINE_RUN_STATUS_RUNNING) && (
                         <Button variant="danger" size="small" onClick={handleCancelPipeline} disabled={cancelling}>
                             {cancelling ? 'Cancelling…' : '⊗ Cancel Pipeline'}
                         </Button>
