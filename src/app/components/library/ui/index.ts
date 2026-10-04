@@ -85,6 +85,10 @@ export { Code, CodeBlock } from './Code';
 // Badge
 export { Badge } from './Badge';
 
+// Provenance chip
+export { ProvenanceChip } from './ProvenanceChip';
+export type { ProvenanceChipProps } from './ProvenanceChip';
+
 // Icon
 export { Icon } from './Icon';
 
