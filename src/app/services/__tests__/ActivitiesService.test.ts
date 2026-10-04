@@ -12,7 +12,7 @@ vi.mock('../../../shared/api/client', () => {
   return { client: c, default: c };
 });
 
-import { ActivitiesService, normalizeProvenance } from '../ActivitiesService';
+import { ActivitiesService, normalizeProvenance, normalizeProposal } from '../ActivitiesService';
 
 beforeEach(() => {
   GET.mockReset();
@@ -137,6 +137,136 @@ describe('ActivitiesService.resend', () => {
     POST.mockRejectedValue(new Error('nope'));
     const result = await ActivitiesService.resend('a1');
     expect(result.success).toBe(false);
+  });
+});
+
+describe('ActivitiesService.getResolved (proposal)', () => {
+  it('attaches a staged proposal when the API returns one', async () => {
+    GET.mockResolvedValue({
+      data: {
+        activity: { id: 'a1', description: 'old' },
+        provenance: { description: { kind: 'source', source: 'SOURCE_STRAVA' } },
+        proposal: {
+          id: 'prop-1',
+          origin: 'rerun',
+          enricher: 'workout-summary',
+          activity: { id: 'a1', description: 'new and shiny' },
+          provenance: { description: { kind: 'enricher', enricher: 'workout-summary' } },
+        },
+      },
+    });
+    const result = await ActivitiesService.getResolved('a1');
+    expect(result?.proposal).toEqual({
+      id: 'prop-1',
+      origin: 'rerun',
+      enricher: 'workout-summary',
+      activity: { id: 'a1', description: 'new and shiny' },
+      provenance: { description: { kind: 'enricher', enricher: 'workout-summary' } },
+    });
+  });
+
+  it('omits the proposal key entirely when there is none', async () => {
+    GET.mockResolvedValue({ data: { activity: { id: 'a1' }, provenance: {} } });
+    const result = await ActivitiesService.getResolved('a1');
+    expect(result).toEqual({ activity: { id: 'a1' }, provenance: {} });
+    expect('proposal' in (result ?? {})).toBe(false);
+  });
+});
+
+describe('ActivitiesService.rerunEnricher', () => {
+  it('POSTs to the per-enricher rerun route then re-reads the resolved activity', async () => {
+    POST.mockResolvedValue({ data: undefined });
+    GET.mockResolvedValue({
+      data: {
+        activity: { id: 'a1' },
+        provenance: {},
+        proposal: { id: 'p1', origin: 'rerun', enricher: 'workout-summary', activity: { id: 'a1' } },
+      },
+    });
+    const result = await ActivitiesService.rerunEnricher('a1', 'workout-summary');
+    expect(POST).toHaveBeenCalledWith(expect.stringContaining('/enrichers/'), {
+      params: { path: { id: 'a1', enricher: 'workout-summary' } },
+    });
+    expect(result?.proposal?.id).toBe('p1');
+  });
+
+  it('propagates failures to the caller', async () => {
+    POST.mockRejectedValue(new Error('boom'));
+    await expect(ActivitiesService.rerunEnricher('a1', 'x')).rejects.toThrow('boom');
+    expect(GET).not.toHaveBeenCalled();
+  });
+});
+
+describe('ActivitiesService.repullFromSource', () => {
+  it('POSTs to the repull route then re-reads', async () => {
+    POST.mockResolvedValue({ data: undefined });
+    GET.mockResolvedValue({ data: { activity: { id: 'a1' }, provenance: {} } });
+    await ActivitiesService.repullFromSource('a1');
+    expect(POST).toHaveBeenCalledWith(expect.stringContaining('/repull'), {
+      params: { path: { id: 'a1' } },
+    });
+  });
+});
+
+describe('ActivitiesService.acceptProposal', () => {
+  it('POSTs the proposalId to the accept route then re-reads the applied activity', async () => {
+    POST.mockResolvedValue({ data: undefined });
+    GET.mockResolvedValue({
+      data: {
+        activity: { id: 'a1', description: 'new and shiny' },
+        provenance: { description: { kind: 'enricher', enricher: 'workout-summary' } },
+      },
+    });
+    const result = await ActivitiesService.acceptProposal('a1', 'p1');
+    expect(POST).toHaveBeenCalledWith(expect.stringContaining('/proposal/accept'), {
+      params: { path: { id: 'a1' } },
+      body: { proposalId: 'p1' },
+    });
+    expect(result?.proposal).toBeUndefined();
+    expect(result?.activity.description).toBe('new and shiny');
+  });
+});
+
+describe('ActivitiesService.dismissProposal', () => {
+  it('POSTs the proposalId to the dismiss route then re-reads', async () => {
+    POST.mockResolvedValue({ data: undefined });
+    GET.mockResolvedValue({ data: { activity: { id: 'a1' }, provenance: {} } });
+    await ActivitiesService.dismissProposal('a1', 'p1');
+    expect(POST).toHaveBeenCalledWith(expect.stringContaining('/proposal/dismiss'), {
+      params: { path: { id: 'a1' } },
+      body: { proposalId: 'p1' },
+    });
+  });
+});
+
+describe('normalizeProposal', () => {
+  it('normalizes a wrapped proposal, tolerating enum origin spellings', () => {
+    expect(
+      normalizeProposal({
+        id: 'p1',
+        origin: 'PROPOSAL_ORIGIN_REPULL',
+        activity: { id: 'a1', name: 'Fresh' },
+        provenance: { name: { kind: 'FIELD_SOURCE_KIND_SOURCE', source: 'SOURCE_STRAVA' } },
+        createdAt: '2026-10-04T12:00:00Z',
+      })
+    ).toEqual({
+      id: 'p1',
+      origin: 'repull',
+      activity: { id: 'a1', name: 'Fresh' },
+      provenance: { name: { kind: 'source', source: 'SOURCE_STRAVA' } },
+      createdAt: '2026-10-04T12:00:00Z',
+    });
+  });
+
+  it('accepts proposalId as the id and defaults origin to rerun', () => {
+    const result = normalizeProposal({ proposalId: 'p2', enricher: 'workout-summary', activity: {} });
+    expect(result).toMatchObject({ id: 'p2', origin: 'rerun', enricher: 'workout-summary' });
+  });
+
+  it('returns null for an un-addressable (id-less) or non-object proposal', () => {
+    expect(normalizeProposal({ activity: { id: 'a1' } })).toBeNull();
+    expect(normalizeProposal(null)).toBeNull();
+    expect(normalizeProposal('nope')).toBeNull();
   });
 });
 

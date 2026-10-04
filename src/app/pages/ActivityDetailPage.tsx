@@ -19,6 +19,7 @@ import { PluginManifest } from '../types/plugin';
 import { BoosterExecution, PipelineRun, PipelineRunStatus } from '../../types/pb/user';
 import { ActivitiesService, SynchronizedActivity, ResolvedActivity } from '../services/ActivitiesService';
 import { ActivityProvenancePanel } from '../components/ActivityProvenancePanel';
+import { EnricherControlsPanel } from '../components/EnricherControlsPanel';
 import './RunDetail.css';
 
 interface ProviderExecution {
@@ -635,6 +636,17 @@ const ActivityDetailPage: React.FC = () => {
                         <ActivityProvenancePanel
                             activity={resolved.activity}
                             provenance={resolved.provenance}
+                            activityId={id}
+                            onChange={setResolved}
+                        />
+                    )}
+
+                    {/* Enricher contributions + controls (re-run, re-pull, accept/dismiss) */}
+                    {resolved && id && (
+                        <EnricherControlsPanel
+                            activity={resolved.activity}
+                            provenance={resolved.provenance}
+                            proposal={resolved.proposal}
                             activityId={id}
                             onChange={setResolved}
                         />
