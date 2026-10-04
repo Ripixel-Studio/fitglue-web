@@ -40,6 +40,16 @@ export interface ResolvedActivity {
 }
 
 /**
+ * The fields an athlete may edit by hand on web. These map one-to-one onto the
+ * editable rows in the resolved-activity panel and onto what `UpdateActivity`
+ * accepts on the gateway. Anything the athlete sets here becomes `user`
+ * provenance ("edited by you") server-side.
+ */
+export type ActivityEdits = Partial<
+  Pick<StandardizedActivity, 'name' | 'type' | 'startTime' | 'description' | 'notes' | 'tags'>
+>;
+
+/**
  * Normalise one raw provenance kind into the UI's canonical lowercase form.
  * Tolerant of enum spellings ("FIELD_SOURCE_KIND_SOURCE"), plain words ("source"),
  * and the "edited by you" sense ("user"/"edit"). Returns null for anything else.
@@ -144,6 +154,8 @@ export interface IActivitiesService {
   }>;
   get(id: string): Promise<SynchronizedActivity | null>;
   getResolved(id: string): Promise<ResolvedActivity | null>;
+  update(id: string, edits: ActivityEdits): Promise<ResolvedActivity | null>;
+  resend(id: string): Promise<RepostResponse>;
   listUnsynchronized(limit?: number, offset?: number): Promise<UnsynchronizedEntry[]>;
   getUnsynchronizedTrace(pipelineExecutionId: string): Promise<{ pipelineExecutionId: string; pipelineExecution: ExecutionRecord[] } | null>;
   repostToMissedDestination(activityId: string, destination: string): Promise<RepostResponse>;
@@ -192,6 +204,45 @@ export const ActivitiesService: IActivitiesService = {
       return { activity, provenance };
     } catch {
       return null;
+    }
+  },
+
+  /**
+   * Edit one or more fields of a resolved activity by hand (`UpdateActivity`).
+   *
+   * The gateway wraps the entity the same way `UpdatePipeline` / `UpdateProfile`
+   * do — `{ id, activity }` on `PUT /users/me/activities/{id}` — so we follow
+   * that convention. The put isn't in the generated client surface yet (the
+   * generated path only exposes GET/DELETE/repost), so the path is cast onto a
+   * sibling PUT route until the gateway proto gains `UpdateActivity`; the wire
+   * contract (`{ id, activity }`) is unaffected by the cast.
+   *
+   * After writing, we re-read the resolved activity so the returned provenance
+   * reflects the server's record — the edited fields come back as `user`
+   * ("edited by you"). Throws (via the throwing client) if the write fails, so
+   * callers can surface the failure to the athlete.
+   */
+  async update(id: string, edits: ActivityEdits) {
+    await client.PUT('/users/me/activities/{id}' as '/users/me/pipelines/{id}', {
+      params: { path: { id } },
+      body: { id, activity: edits } as never,
+    });
+    return ActivitiesService.getResolved(id);
+  },
+
+  /**
+   * Re-send an already-synced activity to its destinations with its current
+   * resolved field values (`RepostActivity`). Used by the "re-send" control
+   * after inline edits so destinations pick up the hand-edited values.
+   */
+  async resend(id: string): Promise<RepostResponse> {
+    try {
+      await client.POST('/users/me/activities/{id}/repost', {
+        params: { path: { id } },
+      });
+      return { success: true, message: 'Activity re-sent to its destinations' };
+    } catch {
+      return { success: false, message: 'Failed to re-send activity' };
     }
   },
 
