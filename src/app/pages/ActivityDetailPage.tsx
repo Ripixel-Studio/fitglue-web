@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRealtimePipelines } from '../hooks/useRealtimePipelines';
 import { usePluginRegistry } from '../hooks/usePluginRegistry';
@@ -17,7 +17,8 @@ import { buildDestinationUrl } from '../utils/destinationUrls';
 import { isNativeApp, sendToNative } from '../../shared/nativeBridge';
 import { PluginManifest } from '../types/plugin';
 import { BoosterExecution, PipelineRun, PipelineRunStatus } from '../../types/pb/user';
-import { SynchronizedActivity } from '../services/ActivitiesService';
+import { ActivitiesService, SynchronizedActivity, ResolvedActivity } from '../services/ActivitiesService';
+import { ActivityProvenancePanel } from '../components/ActivityProvenancePanel';
 import './RunDetail.css';
 
 interface ProviderExecution {
@@ -293,6 +294,25 @@ const ActivityDetailPage: React.FC = () => {
 
     // Provider list filter: ALL | OK | SKIP
     const [providerFilter, setProviderFilter] = useState<'ALL' | 'OK' | 'SKIP'>('ALL');
+
+    // Resolved activity + per-field provenance, fetched from the read API.
+    // This is the authoritative "what will sync" view, independent of the
+    // Firestore pipeline-run trace below. Absent provenance degrades gracefully.
+    const [resolved, setResolved] = useState<ResolvedActivity | null>(null);
+
+    useEffect(() => {
+        if (!id) {
+            setResolved(null);
+            return;
+        }
+        let cancelled = false;
+        ActivitiesService.getResolved(id).then((result) => {
+            if (!cancelled) setResolved(result);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
 
     // Get pipeline runs - this is now the PRIMARY data source
     const { pipelineRuns, loading } = useRealtimePipelineRuns(true, 50);
@@ -610,6 +630,14 @@ const ActivityDetailPage: React.FC = () => {
 
                 {/* Right body */}
                 <div className="rd-body">
+                    {/* Resolved activity with per-field provenance (from the read API) */}
+                    {resolved && (
+                        <ActivityProvenancePanel
+                            activity={resolved.activity}
+                            provenance={resolved.provenance}
+                        />
+                    )}
+
                     {/* Enriched activity description (aggregate of all enrichers) — preserves newlines and bullets */}
                     {pipelineRun.description && (
                         <div className="ai-card">

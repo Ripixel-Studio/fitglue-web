@@ -1,0 +1,92 @@
+/* Resolved-activity panel — mirrors the .ai-card slab on the activity detail page,
+   but tinted cyan (source-of-truth) rather than violet (enricher output). */
+.activity-provenance {
+    margin: 24px 32px;
+    background: var(--fg-ink-2);
+    border-left: 4px solid var(--fg-cyan, var(--fg-violet));
+    min-width: 0;
+}
+
+.activity-provenance__head {
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.activity-provenance__head h3 {
+    font-family: var(--fg-font-display);
+    font-size: .9375rem;
+    letter-spacing: -.005em;
+    margin: 0;
+    color: var(--fg-paper);
+}
+
+.activity-provenance__hint {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    text-align: right;
+}
+
+.activity-provenance__fields {
+    margin: 0;
+    padding: 8px 0;
+}
+
+.activity-provenance__row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    padding: 12px 24px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.activity-provenance__row:last-child {
+    border-bottom: none;
+}
+
+.activity-provenance__label {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-top: 2px;
+}
+
+.activity-provenance__value {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+}
+
+.activity-provenance__text {
+    font-family: var(--fg-font-mono);
+    font-size: .8125rem;
+    line-height: 1.6;
+    color: var(--fg-paper);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+@media (max-width: 1024px) {
+    .activity-provenance {
+        margin: 16px;
+    }
+
+    .activity-provenance__row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+}

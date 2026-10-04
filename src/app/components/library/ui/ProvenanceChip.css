@@ -1,0 +1,6 @@
+/* Colour and base shape come from .fg-stamp / .fg-stamp--* (app-components.css).
+   These rules only tune provenance chips so they sit neatly beside a field value. */
+.fg-provenance-chip {
+    vertical-align: middle;
+    white-space: nowrap;
+}

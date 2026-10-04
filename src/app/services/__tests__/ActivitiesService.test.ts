@@ -7,7 +7,7 @@ vi.mock('../../../shared/api/client', () => ({
   default: { GET: (...a: unknown[]) => GET(...a), POST: (...a: unknown[]) => POST(...a) },
 }));
 
-import { ActivitiesService } from '../ActivitiesService';
+import { ActivitiesService, normalizeProvenance } from '../ActivitiesService';
 
 beforeEach(() => {
   GET.mockReset();
@@ -45,6 +45,81 @@ describe('ActivitiesService.get', () => {
   it('returns null on error', async () => {
     GET.mockRejectedValue(new Error('nope'));
     expect(await ActivitiesService.get('a1')).toBeNull();
+  });
+});
+
+describe('ActivitiesService.getResolved', () => {
+  it('returns the activity and normalized provenance (wrapped response)', async () => {
+    GET.mockResolvedValue({
+      data: {
+        activity: { id: 'a1', name: 'Run' },
+        provenance: {
+          name: { kind: 'user', updatedAt: '2026-10-04T09:00:00Z' },
+          description: { kind: 'enricher', enricher: 'workout-summary' },
+        },
+      },
+    });
+    expect(await ActivitiesService.getResolved('a1')).toEqual({
+      activity: { id: 'a1', name: 'Run' },
+      provenance: {
+        name: { kind: 'user', updatedAt: '2026-10-04T09:00:00Z' },
+        description: { kind: 'enricher', enricher: 'workout-summary' },
+      },
+    });
+  });
+
+  it('reads a bare activity response with provenance alongside', async () => {
+    GET.mockResolvedValue({
+      data: { id: 'a1', name: 'Run', provenance: { name: { kind: 'source', source: 'SOURCE_STRAVA' } } },
+    });
+    const result = await ActivitiesService.getResolved('a1');
+    expect(result?.activity).toMatchObject({ id: 'a1', name: 'Run' });
+    expect(result?.provenance).toEqual({ name: { kind: 'source', source: 'SOURCE_STRAVA' } });
+  });
+
+  it('returns empty provenance when the API omits it', async () => {
+    GET.mockResolvedValue({ data: { activity: { id: 'a1' } } });
+    expect(await ActivitiesService.getResolved('a1')).toEqual({ activity: { id: 'a1' }, provenance: {} });
+  });
+
+  it('returns null on error', async () => {
+    GET.mockRejectedValue(new Error('nope'));
+    expect(await ActivitiesService.getResolved('a1')).toBeNull();
+  });
+});
+
+describe('normalizeProvenance', () => {
+  it('maps enum-style kinds to the canonical lowercase form', () => {
+    expect(
+      normalizeProvenance({
+        name: { kind: 'FIELD_SOURCE_KIND_SOURCE', source: 'SOURCE_STRAVA' },
+        description: { kind: 'FIELD_SOURCE_KIND_ENRICHER', enricher: 'workout-summary' },
+        notes: { kind: 'FIELD_SOURCE_KIND_USER_EDIT' },
+      })
+    ).toEqual({
+      name: { kind: 'source', source: 'SOURCE_STRAVA' },
+      description: { kind: 'enricher', enricher: 'workout-summary' },
+      notes: { kind: 'user' },
+    });
+  });
+
+  it('accepts origin/type as synonyms for kind', () => {
+    expect(normalizeProvenance({ a: { origin: 'source' }, b: { type: 'enricher' } })).toEqual({
+      a: { kind: 'source' },
+      b: { kind: 'enricher' },
+    });
+  });
+
+  it('drops entries with an unrecognised or missing kind', () => {
+    expect(
+      normalizeProvenance({ good: { kind: 'user' }, bad: { kind: 'mystery' }, empty: {} })
+    ).toEqual({ good: { kind: 'user' } });
+  });
+
+  it('returns an empty map for non-object input', () => {
+    expect(normalizeProvenance(undefined)).toEqual({});
+    expect(normalizeProvenance(null)).toEqual({});
+    expect(normalizeProvenance('nope')).toEqual({});
   });
 });
 
