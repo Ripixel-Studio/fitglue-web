@@ -635,6 +635,8 @@ const ActivityDetailPage: React.FC = () => {
                         <ActivityProvenancePanel
                             activity={resolved.activity}
                             provenance={resolved.provenance}
+                            activityId={id}
+                            onChange={setResolved}
                         />
                     )}
 

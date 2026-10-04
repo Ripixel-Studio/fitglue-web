@@ -2,16 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const GET = vi.fn();
 const POST = vi.fn();
-vi.mock('../../../shared/api/client', () => ({
-  client: { GET: (...a: unknown[]) => GET(...a), POST: (...a: unknown[]) => POST(...a) },
-  default: { GET: (...a: unknown[]) => GET(...a), POST: (...a: unknown[]) => POST(...a) },
-}));
+const PUT = vi.fn();
+vi.mock('../../../shared/api/client', () => {
+  const c = {
+    GET: (...a: unknown[]) => GET(...a),
+    POST: (...a: unknown[]) => POST(...a),
+    PUT: (...a: unknown[]) => PUT(...a),
+  };
+  return { client: c, default: c };
+});
 
 import { ActivitiesService, normalizeProvenance } from '../ActivitiesService';
 
 beforeEach(() => {
   GET.mockReset();
   POST.mockReset();
+  PUT.mockReset();
 });
 
 describe('ActivitiesService.getStats', () => {
@@ -85,6 +91,52 @@ describe('ActivitiesService.getResolved', () => {
   it('returns null on error', async () => {
     GET.mockRejectedValue(new Error('nope'));
     expect(await ActivitiesService.getResolved('a1')).toBeNull();
+  });
+});
+
+describe('ActivitiesService.update', () => {
+  it('PUTs the wrapped edits then re-reads the resolved activity', async () => {
+    PUT.mockResolvedValue({ data: { id: 'a1', name: 'Evening Run' } });
+    GET.mockResolvedValue({
+      data: {
+        activity: { id: 'a1', name: 'Evening Run' },
+        provenance: { name: { kind: 'user', updatedAt: '2026-10-04T10:00:00Z' } },
+      },
+    });
+
+    const result = await ActivitiesService.update('a1', { name: 'Evening Run' });
+
+    expect(PUT).toHaveBeenCalledWith(expect.any(String), {
+      params: { path: { id: 'a1' } },
+      body: { id: 'a1', activity: { name: 'Evening Run' } },
+    });
+    expect(result).toEqual({
+      activity: { id: 'a1', name: 'Evening Run' },
+      provenance: { name: { kind: 'user', updatedAt: '2026-10-04T10:00:00Z' } },
+    });
+  });
+
+  it('propagates write failures to the caller', async () => {
+    PUT.mockRejectedValue(new Error('boom'));
+    await expect(ActivitiesService.update('a1', { name: 'x' })).rejects.toThrow('boom');
+    expect(GET).not.toHaveBeenCalled();
+  });
+});
+
+describe('ActivitiesService.resend', () => {
+  it('POSTs to the repost route and reports success', async () => {
+    POST.mockResolvedValue({ data: undefined });
+    const result = await ActivitiesService.resend('a1');
+    expect(POST).toHaveBeenCalledWith('/users/me/activities/{id}/repost', {
+      params: { path: { id: 'a1' } },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('reports a failure instead of throwing', async () => {
+    POST.mockRejectedValue(new Error('nope'));
+    const result = await ActivitiesService.resend('a1');
+    expect(result.success).toBe(false);
   });
 });
 

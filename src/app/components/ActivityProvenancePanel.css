@@ -80,6 +80,92 @@
     word-break: break-word;
 }
 
+.activity-provenance__text--empty {
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* Inline "✎ Edit" affordance — quiet until hovered, like the other row chips. */
+.activity-provenance__edit-btn {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: none;
+    border: var(--fg-rule-thin);
+    border-radius: 3px;
+    padding: 2px 7px;
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease;
+}
+
+.activity-provenance__edit-btn:hover {
+    color: var(--fg-paper);
+    border-color: var(--fg-cyan, var(--fg-violet));
+}
+
+/* Inline editor: input/select/textarea plus Save / Cancel. Occupies the whole
+   value column so long text and the action row stack cleanly. */
+.activity-provenance__editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.activity-provenance__input {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--fg-font-mono);
+    font-size: .8125rem;
+    line-height: 1.5;
+    color: var(--fg-paper);
+    background: var(--fg-ink-1, var(--fg-ink-2));
+    border: var(--fg-rule-thin);
+    border-radius: 4px;
+    padding: 7px 9px;
+}
+
+.activity-provenance__input:focus {
+    outline: none;
+    border-color: var(--fg-cyan, var(--fg-violet));
+}
+
+.activity-provenance__input--area {
+    resize: vertical;
+    min-height: 76px;
+}
+
+.activity-provenance__editor-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Re-send control footer — sits below the field list, tied to the "what will be
+   sent" framing in the header. */
+.activity-provenance__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 20px;
+    border-top: var(--fg-rule-thin);
+}
+
+.activity-provenance__foot-hint {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
 @media (max-width: 1024px) {
     .activity-provenance {
         margin: 16px;
