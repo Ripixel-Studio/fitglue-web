@@ -44,4 +44,41 @@ describe('initFirebase messaging guard', () => {
     expect(state.getMessaging).toHaveBeenCalledTimes(1);
     expect(mod.getFirebaseMessaging()).toEqual({ messaging: true });
   });
+
+  it('shares one init across concurrent callers instead of double initializeApp (WEB-APP-4)', async () => {
+    state.supported = true;
+
+    // Mirror the real Firebase SDK: initializeApp() throws "app/duplicate-app"
+    // if the default app is initialised twice. With the pre-fix code, two
+    // concurrent initFirebase() callers both passed the "already initialised?"
+    // guard (it awaits the hosting config before assigning), both reached here,
+    // and the second throw became an unhandled rejection → Sentry "Error" at /app/.
+    const { initializeApp } = (await import('firebase/app')) as unknown as {
+      initializeApp: ReturnType<typeof vi.fn>;
+    };
+    let appCount = 0;
+    initializeApp.mockImplementation(() => {
+      appCount += 1;
+      if (appCount > 1) {
+        throw new Error('Firebase App named "[DEFAULT]" already exists (app/duplicate-app)');
+      }
+      return { app: true };
+    });
+
+    const mod = await import('../firebase');
+
+    // Two callers racing on the same /app mount. Neither rejects, and
+    // initializeApp runs exactly once.
+    const [a, b] = await Promise.all([mod.initFirebase(), mod.initFirebase()]);
+
+    expect(a).not.toBeNull();
+    expect(a).toBe(b);
+    expect(appCount).toBe(1);
+
+    // A later call still returns the same cached Firebase instances (fresh wrapper
+    // object, same underlying app/auth/firestore) without re-initialising.
+    const c = await mod.initFirebase();
+    expect(c).toEqual(a);
+    expect(appCount).toBe(1);
+  });
 });
