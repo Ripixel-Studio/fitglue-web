@@ -1,0 +1,185 @@
+/* Enricher presentation + controls — sits below the resolved-activity panel on
+   the activity detail page. Tinted violet (enricher output) to the provenance
+   panel's cyan (source of truth). */
+.enricher-controls {
+    margin: 24px 32px;
+    background: var(--fg-ink-2);
+    border-left: 4px solid var(--fg-violet);
+    min-width: 0;
+}
+
+.enricher-controls__head {
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.enricher-controls__head h3 {
+    font-family: var(--fg-font-display);
+    font-size: .9375rem;
+    letter-spacing: -.005em;
+    margin: 0;
+    color: var(--fg-paper);
+}
+
+.enricher-controls__empty {
+    font-family: var(--fg-font-mono);
+    font-size: .75rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0;
+    padding: 16px 20px;
+}
+
+/* ── Enricher contribution list ── */
+.enricher-controls__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.enricher-controls__item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.enricher-controls__item:last-child {
+    border-bottom: none;
+}
+
+.enricher-controls__icon {
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+.enricher-controls__detail {
+    min-width: 0;
+}
+
+.enricher-controls__name {
+    font-family: var(--fg-font-display);
+    font-size: .8125rem;
+    color: var(--fg-paper);
+}
+
+.enricher-controls__fields {
+    font-family: var(--fg-font-mono);
+    font-size: .6875rem;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* ── Proposed-change review card ── */
+.enricher-controls__proposal {
+    margin: 16px 20px;
+    border: var(--fg-rule-thin);
+    border-color: var(--fg-violet);
+    border-radius: 6px;
+    background: var(--fg-ink-1, var(--fg-ink-2));
+}
+
+.enricher-controls__proposal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.enricher-controls__proposal-title {
+    font-family: var(--fg-font-display);
+    font-size: .8125rem;
+    color: var(--fg-paper);
+}
+
+.enricher-controls__proposal-origin {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.enricher-controls__diff {
+    margin: 0;
+    padding: 8px 0;
+}
+
+.enricher-controls__diff-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 14px;
+    padding: 10px 16px;
+    border-bottom: var(--fg-rule-thin);
+}
+
+.enricher-controls__diff-row:last-child {
+    border-bottom: none;
+}
+
+.enricher-controls__diff-label {
+    font-family: var(--fg-font-mono);
+    font-size: .625rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-top: 2px;
+}
+
+.enricher-controls__diff-values {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.enricher-controls__diff-before {
+    font-family: var(--fg-font-mono);
+    font-size: .8125rem;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    overflow-wrap: anywhere;
+}
+
+.enricher-controls__diff-arrow {
+    color: var(--fg-violet);
+}
+
+.enricher-controls__diff-after {
+    font-family: var(--fg-font-mono);
+    font-size: .8125rem;
+    color: var(--fg-paper);
+    overflow-wrap: anywhere;
+}
+
+.enricher-controls__proposal-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: var(--fg-rule-thin);
+}
+
+@media (max-width: 1024px) {
+    .enricher-controls {
+        margin: 16px;
+    }
+
+    .enricher-controls__diff-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+}

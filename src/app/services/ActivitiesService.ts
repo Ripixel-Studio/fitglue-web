@@ -33,10 +33,47 @@ export interface FieldProvenance {
 /** Per-field provenance, keyed by `StandardizedActivity` field name (e.g. "name", "description"). */
 export type ActivityProvenance = Record<string, FieldProvenance>;
 
+/**
+ * What produced a proposed re-run of an activity:
+ *   - 'repull' → the activity was pulled fresh from its origin source platform
+ *   - 'rerun'  → a single enricher was re-run against the current activity
+ *
+ * The gateway may serialise this as an enum ("PROPOSAL_ORIGIN_REPULL") or a plain
+ * word; `normalizeProposal` is tolerant of both.
+ */
+export type ProposalOrigin = 'repull' | 'rerun';
+
+/**
+ * A proposed new version of an activity, produced by a re-pull from source or an
+ * enricher re-run, held server-side until the athlete accepts or dismisses it.
+ * Carries the full proposed resolved activity plus the provenance of each field,
+ * so the UI can diff it against the live activity before anything is applied.
+ */
+export interface ActivityProposal {
+  /** Opaque id so accept/dismiss target the exact proposal the athlete reviewed. */
+  id: string;
+  /** What produced the proposal. */
+  origin: ProposalOrigin;
+  /** When `origin === 'rerun'`, the enricher id/provider that produced it. */
+  enricher?: string;
+  /** The proposed resolved activity. */
+  activity: StandardizedActivity;
+  /** Provenance of each proposed field (same shape as the live activity's). */
+  provenance: ActivityProvenance;
+  /** ISO timestamp the proposal was created, when the API provides it. */
+  createdAt?: string;
+}
+
 /** A resolved activity together with the provenance of each of its fields. */
 export interface ResolvedActivity {
   activity: StandardizedActivity;
   provenance: ActivityProvenance;
+  /**
+   * A pending proposed re-run of this activity awaiting the athlete's decision,
+   * produced by a re-pull from source or an enricher re-run. Absent when there is
+   * nothing to review.
+   */
+  proposal?: ActivityProposal | null;
 }
 
 /**
@@ -48,6 +85,20 @@ export interface ResolvedActivity {
 export type ActivityEdits = Partial<
   Pick<StandardizedActivity, 'name' | 'type' | 'startTime' | 'description' | 'notes' | 'tags'>
 >;
+
+/**
+ * Human labels for the provenanced/editable activity fields, in reading order.
+ * Shared by the enricher-contributions and proposal-diff views so the field set
+ * and its ordering can never drift from `ActivityEdits` / the resolved panel.
+ */
+export const ACTIVITY_FIELD_LABELS: ReadonlyArray<{ key: keyof ActivityEdits; label: string }> = [
+  { key: 'name', label: 'Title' },
+  { key: 'type', label: 'Type' },
+  { key: 'startTime', label: 'Start' },
+  { key: 'description', label: 'Description' },
+  { key: 'notes', label: 'Notes' },
+  { key: 'tags', label: 'Tags' },
+];
 
 /**
  * Normalise one raw provenance kind into the UI's canonical lowercase form.
@@ -90,6 +141,36 @@ export function normalizeProvenance(raw: unknown): ActivityProvenance {
     if (entry) out[field] = entry;
   }
   return out;
+}
+
+/** Normalise a raw proposal-origin value into the UI's canonical form. */
+function normalizeProposalOrigin(raw: unknown): ProposalOrigin {
+  return typeof raw === 'string' && /pull/i.test(raw) ? 'repull' : 'rerun';
+}
+
+/**
+ * Normalise a raw proposal from the read API into an `ActivityProposal`, tolerant
+ * of whether the proposed activity is bare or wrapped in `{ activity }` and of
+ * where the id is carried (`id` or `proposalId`). Returns null for anything that
+ * can't be identified — an un-addressable proposal can't be accepted or dismissed,
+ * so it's safer to show nothing than an un-actionable card.
+ */
+export function normalizeProposal(raw: unknown): ActivityProposal | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const v = raw as Record<string, unknown>;
+  const id = typeof v.id === 'string' ? v.id : typeof v.proposalId === 'string' ? v.proposalId : '';
+  if (!id) return null;
+  const activityRaw =
+    v.activity && typeof v.activity === 'object' ? (v.activity as Record<string, unknown>) : {};
+  const proposal: ActivityProposal = {
+    id,
+    origin: normalizeProposalOrigin(v.origin ?? v.kind ?? v.source),
+    activity: activityRaw as StandardizedActivity,
+    provenance: normalizeProvenance(v.provenance ?? activityRaw.provenance),
+  };
+  if (typeof v.enricher === 'string') proposal.enricher = v.enricher;
+  if (typeof v.createdAt === 'string') proposal.createdAt = v.createdAt;
+  return proposal;
 }
 
 // These types would come from the generated schema once activities
@@ -156,6 +237,10 @@ export interface IActivitiesService {
   getResolved(id: string): Promise<ResolvedActivity | null>;
   update(id: string, edits: ActivityEdits): Promise<ResolvedActivity | null>;
   resend(id: string): Promise<RepostResponse>;
+  rerunEnricher(id: string, enricher: string): Promise<ResolvedActivity | null>;
+  repullFromSource(id: string): Promise<ResolvedActivity | null>;
+  acceptProposal(id: string, proposalId: string): Promise<ResolvedActivity | null>;
+  dismissProposal(id: string, proposalId: string): Promise<ResolvedActivity | null>;
   listUnsynchronized(limit?: number, offset?: number): Promise<UnsynchronizedEntry[]>;
   getUnsynchronizedTrace(pipelineExecutionId: string): Promise<{ pipelineExecutionId: string; pipelineExecution: ExecutionRecord[] } | null>;
   repostToMissedDestination(activityId: string, destination: string): Promise<RepostResponse>;
@@ -201,7 +286,12 @@ export const ActivitiesService: IActivitiesService = {
       const wrapped = record.activity as Record<string, unknown> | undefined;
       const activity = (wrapped ?? record) as StandardizedActivity;
       const provenance = normalizeProvenance(record.provenance ?? wrapped?.provenance);
-      return { activity, provenance };
+      const resolved: ResolvedActivity = { activity, provenance };
+      // Only attach a proposal when the API actually returns one, so the shape
+      // stays `{ activity, provenance }` for the common (no-pending-run) case.
+      const proposal = normalizeProposal(record.proposal ?? wrapped?.proposal);
+      if (proposal) resolved.proposal = proposal;
+      return resolved;
     } catch {
       return null;
     }
@@ -244,6 +334,67 @@ export const ActivitiesService: IActivitiesService = {
     } catch {
       return { success: false, message: 'Failed to re-send activity' };
     }
+  },
+
+  /**
+   * Re-run a single enricher against the activity's current resolved values
+   * (`RerunEnricher`). The gateway runs the enricher fresh and stages its output
+   * as a *proposal* rather than applying it, so the athlete reviews the change
+   * before anything is re-sent. We re-read the resolved activity afterwards so the
+   * freshly-staged `proposal` comes back on the returned view.
+   *
+   * The route isn't in the generated client surface yet (the gateway proto needs
+   * `RerunEnricher`); the path is cast onto a sibling activities POST route until
+   * it is. The wire contract — `POST /users/me/activities/{id}/enrichers/{enricher}/rerun`
+   * — is unaffected by the cast. Throws (via the throwing client) on failure.
+   */
+  async rerunEnricher(id: string, enricher: string) {
+    await client.POST(
+      '/users/me/activities/{id}/enrichers/{enricher}/rerun' as '/users/me/activities/{id}/repost',
+      { params: { path: { id, enricher } } as never }
+    );
+    return ActivitiesService.getResolved(id);
+  },
+
+  /**
+   * Re-pull the activity from its origin source platform (`RepullActivity`),
+   * picking up anything that changed there (edited title, added photos, corrected
+   * GPS, …). Like `rerunEnricher`, the gateway stages the fresh pull as a proposal
+   * for review rather than applying it, so we re-read to surface it. Throws on
+   * failure. Route pending `RepullActivity` in the gateway proto.
+   */
+  async repullFromSource(id: string) {
+    await client.POST('/users/me/activities/{id}/repull' as '/users/me/activities/{id}/repost', {
+      params: { path: { id } },
+    });
+    return ActivitiesService.getResolved(id);
+  },
+
+  /**
+   * Apply a staged proposal (`AcceptProposal`): its proposed values become the
+   * activity's resolved values and the pending proposal is cleared. We re-read so
+   * the returned view reflects the applied values with their new provenance and no
+   * lingering proposal. Throws on failure. Route pending `AcceptProposal`.
+   */
+  async acceptProposal(id: string, proposalId: string) {
+    await client.POST('/users/me/activities/{id}/proposal/accept' as '/users/me/activities/{id}/repost', {
+      params: { path: { id } },
+      body: { proposalId } as never,
+    });
+    return ActivitiesService.getResolved(id);
+  },
+
+  /**
+   * Discard a staged proposal (`DismissProposal`) without touching the activity's
+   * resolved values. We re-read so the returned view no longer carries the
+   * proposal. Throws on failure. Route pending `DismissProposal`.
+   */
+  async dismissProposal(id: string, proposalId: string) {
+    await client.POST('/users/me/activities/{id}/proposal/dismiss' as '/users/me/activities/{id}/repost', {
+      params: { path: { id } },
+      body: { proposalId } as never,
+    });
+    return ActivitiesService.getResolved(id);
   },
 
   // TODO: Add /users/me/activities/unsynchronized to gateway proto
