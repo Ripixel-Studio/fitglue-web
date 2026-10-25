@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.0.0](https://github.com/fitglue/web/compare/v11.94.23...v12.0.0) (2026-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* delete the showcase SPA (rethink F1.5b) (#25)
+
+### Features
+
+* delete the showcase SPA (rethink F1.5b) ([#25](https://github.com/fitglue/web/issues/25)) ([e333c4c](https://github.com/fitglue/web/commit/e333c4c87d99745317db6ae6f506bbc31ff7ef9c))
+
 ### [11.94.23](https://github.com/fitglue/web/compare/v11.94.22...v11.94.23) (2026-10-25)
 
 ### [11.94.22](https://github.com/fitglue/web/compare/v11.94.21...v11.94.22) (2026-10-25)
