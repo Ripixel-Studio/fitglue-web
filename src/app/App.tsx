@@ -8,7 +8,6 @@ import { userAtom, authLoadingAtom } from './state/authState';
 import { initSentry, setUser as setSentryUser, Sentry } from './infrastructure/sentry';
 import { Stack } from './components/library/layout';
 import { Card, Heading, Paragraph, Button, Code, ToastProvider, AppLoadingScreen, ConnectionBanner } from './components/library/ui';
-import { Link } from './components/library/navigation';
 
 // App pages (protected)
 import DashboardPage from './pages/DashboardPage';
@@ -27,8 +26,6 @@ import PipelineEditPage from './pages/PipelineEditPage';
 import AccountSettingsPage from './pages/AccountSettingsPage';
 import EnricherDataPage from './pages/EnricherDataPage';
 import SubscriptionPage from './pages/SubscriptionPage';
-import AdminPage from './pages/AdminPage';
-import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import ShowcaseManagementPage from './pages/ShowcaseManagementPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ComponentLibraryPage from './pages/ComponentLibraryPage';
@@ -76,37 +73,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return (
       <Card>
         <Paragraph>Redirecting...</Paragraph>
-      </Card>
-    );
-  }
-
-  return <>{children}</>;
-};
-
-// Admin route wrapper - ensures user has admin role
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useUser();
-
-  // useUser now properly includes auth loading, so this handles the full loading story
-  if (loading) {
-    return (
-      <Card>
-        <Stack gap="md" align="center">
-          <Heading level={3}>Loading Admin Console</Heading>
-          <Paragraph>Verifying admin permissions...</Paragraph>
-        </Stack>
-      </Card>
-    );
-  }
-
-  if (!user?.isAdmin) {
-    return (
-      <Card>
-        <Stack gap="md" align="center">
-          <Heading level={2}>Access Denied</Heading>
-          <Paragraph>You do not have admin privileges to view this page.</Paragraph>
-          <Link to="/app">← Back to Dashboard</Link>
-        </Stack>
       </Card>
     );
   }
@@ -231,8 +197,6 @@ const App: React.FC = () => {
               <Route path="/settings/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
               <Route path="/settings/showcase" element={<ProtectedRoute><ShowcaseManagementPage /></ProtectedRoute>} />
               <Route path="/settings/upgrade" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
-              <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-              <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetailPage /></AdminRoute>} />
               {/* Dev tool — component library gallery (no auth required) */}
               <Route path="/dev/library" element={<ComponentLibraryPage />} />
 

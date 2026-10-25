@@ -153,7 +153,6 @@ Some data still requires REST API reads:
 |----------|--------|---------|
 | `/api/registry` | GET | Plugin registry (cached) |
 | `/api/activities/:id/executions` | GET | Detailed execution trace |
-| `/api/admin/**` | GET | Admin dashboard data |
 
 ## Type Generation
 

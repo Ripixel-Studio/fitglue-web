@@ -81,13 +81,6 @@
         }
       },
       {
-        "source": "/api/admin/**",
-        "run": {
-          "serviceId": "api-admin",
-          "region": "us-central1"
-        }
-      },
-      {
         "source": "/app/**",
         "destination": "/app/index.html"
       },

@@ -33,7 +33,6 @@ function clientStub() {
 }
 
 vi.mock('../../../shared/api/client', () => ({ client: clientStub(), default: clientStub() }));
-vi.mock('../../../shared/api/admin-client', () => ({ adminClient: clientStub(), default: clientStub() }));
 vi.mock('../../../shared/api/public-client', () => ({ publicClient: clientStub(), default: clientStub() }));
 vi.mock('../../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock('../../../shared/firebase', () => ({
@@ -111,13 +110,6 @@ vi.mock('../../hooks/useGuidedTour', () => ({
     startTour: vi.fn(), nextStep: vi.fn(), skipTour: vi.fn(), dismissTour: vi.fn(),
   }),
 }));
-vi.mock('../../hooks/admin', () => ({
-  useAdminStats: () => ({ stats: null, loading: false, error: null, refresh: vi.fn() }),
-  useAdminUsers: () => ({ users: [], loading: false, error: null, fetchUsers: vi.fn(), updateUser: vi.fn() }),
-  useAdminPipelineRuns: () => ({ runs: [], stats: null, loading: false, error: null, hasMore: false, fetchRuns: vi.fn(), loadMore: vi.fn(), selectRun: vi.fn() }),
-  useAdminRunOps: () => ({ repost: vi.fn(), cancelRun: vi.fn(), resolvePendingInput: vi.fn() }),
-  useAdminAuditLog: () => ({ entries: [], loading: false, error: null, refresh: vi.fn() }),
-}));
 
 // Pages
 import DashboardPage from '../DashboardPage';
@@ -136,7 +128,6 @@ import PipelineEditPage from '../PipelineEditPage';
 import AccountSettingsPage from '../AccountSettingsPage';
 import EnricherDataPage from '../EnricherDataPage';
 import SubscriptionPage from '../SubscriptionPage';
-import AdminPage from '../AdminPage';
 import ShowcaseManagementPage from '../ShowcaseManagementPage';
 import NotFoundPage from '../NotFoundPage';
 import ComponentLibraryPage from '../ComponentLibraryPage';
@@ -249,11 +240,6 @@ describe('page smoke tests', () => {
 
   it('SubscriptionPage renders', () => {
     const { container } = renderPage(<SubscriptionPage />);
-    expect(container).toBeTruthy();
-  });
-
-  it('AdminPage renders', () => {
-    const { container } = renderPage(<AdminPage />);
     expect(container).toBeTruthy();
   });
 

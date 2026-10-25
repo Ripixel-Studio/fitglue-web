@@ -12,21 +12,6 @@ import type { PendingInput } from "../../models/pipeline/pending_input";
 
 export const protobufPackage = "fitglue.services.pipeline";
 
-/** Admin pipeline runs */
-export interface AdminListPipelineRunsRequest {
-  status: string;
-  source: string;
-  /** optional filter */
-  userId: string;
-  limit: number;
-  pageToken: string;
-}
-
-export interface AdminListPipelineRunsResponse {
-  runs: PipelineRun[];
-  nextPageToken: string;
-}
-
 export interface ListPipelinesRequest {
   userId: string;
 }
@@ -163,7 +148,6 @@ export interface PipelineService {
   RepostActivity(request: RepostActivityRequest): Promise<Empty>;
   GetPipelineRun(request: GetPipelineRunRequest): Promise<PipelineRun>;
   ListPipelineRuns(request: ListPipelineRunsRequest): Promise<ListPipelineRunsResponse>;
-  AdminListPipelineRuns(request: AdminListPipelineRunsRequest): Promise<AdminListPipelineRunsResponse>;
   ListSourceActivities(request: ListSourceActivitiesRequest): Promise<ListSourceActivitiesResponse>;
   BackfillActivities(request: BackfillActivitiesRequest): Promise<BackfillActivitiesResponse>;
 }

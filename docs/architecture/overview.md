@@ -21,7 +21,6 @@ FitGlue Web is a **hybrid architecture** combining a static marketing site with 
 │   │  • Plugin pages           │    │  • Pending Inputs         │     │
 │   │  • Auth pages             │    │  • Account Settings       │     │
 │   │  • Guides                 │    │  • Enricher Data          │     │
-│   │                           │    │  • Admin console          │     │
 │   │  Output: static-dist/     │    │  Output: dist/app/        │     │
 │   └───────────────────────────┘    └───────────────────────────┘     │
 │                                                                       │
@@ -94,7 +93,6 @@ The React app uses a **split architecture** for data access:
 | `/app/settings/upgrade` | SubscriptionPage (alias) |
 | `/app/settings/showcase` | ShowcaseManagementPage |
 | `/app/settings/integrations` | ConnectionsPage (legacy) |
-| `/app/admin` | AdminPage |
 
 ## Build Pipeline
 

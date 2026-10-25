@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtomValue } from 'jotai';
-import { userProfileAtom } from '../../../state/userState';
 import './CommandPalette.css';
 
 interface CommandItem {
@@ -54,14 +52,6 @@ const NAV_ITEMS: CommandItem[] = [
     { id: 'nav-settings',    icon: '⚙', label: 'Settings',    tag: 'PAGE',       href: '/settings/account'       },
 ];
 
-// Admin-only quick actions — gated on the current user's isAdmin flag.
-const ADMIN_ITEMS: CommandItem[] = [
-    { id: 'admin-console', icon: '🛡', label: 'Admin: Console',        tag: 'ADMIN', href: '/admin'                     },
-    { id: 'admin-users',   icon: '👥', label: 'Admin: Find user',      tag: 'ADMIN', href: '/admin?tab=users'           },
-    { id: 'admin-runs',    icon: '🔄', label: 'Admin: Pipeline runs',  tag: 'ADMIN', href: '/admin?tab=pipeline-runs'   },
-    { id: 'admin-audit',   icon: '📜', label: 'Admin: Audit log',      tag: 'ADMIN', href: '/admin?tab=audit'           },
-];
-
 function matchQuery(item: CommandItem, q: string): boolean {
     if (!q) return true;
     return item.label.toLowerCase().includes(q.toLowerCase());
@@ -72,8 +62,6 @@ export const CommandPalette: React.FC<{ onClose: () => void }> = ({ onClose }) =
     const [activeIdx, setActiveIdx] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const profile = useAtomValue(userProfileAtom);
-    const isAdmin = !!profile?.isAdmin;
 
     const groups: CommandGroup[] = [
         {
@@ -86,11 +74,6 @@ export const CommandPalette: React.FC<{ onClose: () => void }> = ({ onClose }) =
             label: 'JUMP TO',
             items: NAV_ITEMS.filter(i => matchQuery(i, query)),
         },
-        ...(isAdmin ? [{
-            key: 'admin',
-            label: 'ADMIN',
-            items: ADMIN_ITEMS.filter(i => matchQuery(i, query)),
-        }] : []),
     ].filter(g => g.items.length > 0);
 
     const flatItems = groups.flatMap(g => g.items);
