@@ -1,53 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { state } = vi.hoisted(() => ({
-  state: {
-    supported: true,
-    getMessaging: vi.fn(() => ({ messaging: true })),
-    isSupported: vi.fn(async () => state.supported),
-  },
-}));
-
 vi.mock('firebase/app', () => ({ initializeApp: vi.fn(() => ({ app: true })) }));
 vi.mock('firebase/auth', () => ({ getAuth: vi.fn(() => ({ auth: true })) }));
 vi.mock('firebase/firestore', () => ({ getFirestore: vi.fn(() => ({ fs: true })) }));
-vi.mock('firebase/messaging', () => ({
-  getMessaging: () => state.getMessaging(),
-  isSupported: () => state.isSupported(),
-}));
 
-describe('initFirebase messaging guard', () => {
+describe('initFirebase', () => {
   beforeEach(() => {
     vi.resetModules();
-    state.getMessaging.mockClear();
-    state.isSupported.mockClear();
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => ({ ok: true, json: async () => ({ appId: '1:x:web:y', projectId: 'p' }) })),
     );
   });
 
-  it('skips getMessaging when the browser is unsupported (WEB-APP-1)', async () => {
-    state.supported = false;
+  it('initialises app, auth and firestore from the hosting config', async () => {
     const mod = await import('../firebase');
     const result = await mod.initFirebase();
-    expect(result).not.toBeNull();
-    expect(state.isSupported).toHaveBeenCalledTimes(1);
-    expect(state.getMessaging).not.toHaveBeenCalled();
-    expect(mod.getFirebaseMessaging()).toBeUndefined();
+    expect(result).toEqual({ app: { app: true }, auth: { auth: true }, firestore: { fs: true } });
+    expect(mod.getFirebaseApp()).toEqual({ app: true });
+    expect(mod.getFirebaseAuth()).toEqual({ auth: true });
+    expect(mod.getFirebaseFirestore()).toEqual({ fs: true });
   });
 
-  it('initialises messaging when supported', async () => {
-    state.supported = true;
+  it('returns null (and leaves the globals unset) when no hosting config is available', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false })));
     const mod = await import('../firebase');
-    await mod.initFirebase();
-    expect(state.getMessaging).toHaveBeenCalledTimes(1);
-    expect(mod.getFirebaseMessaging()).toEqual({ messaging: true });
+    expect(await mod.initFirebase()).toBeNull();
+    expect(mod.getFirebaseApp()).toBeUndefined();
   });
 
   it('shares one init across concurrent callers instead of double initializeApp (WEB-APP-4)', async () => {
-    state.supported = true;
-
     // Mirror the real Firebase SDK: initializeApp() throws "app/duplicate-app"
     // if the default app is initialised twice. With the pre-fix code, two
     // concurrent initFirebase() callers both passed the "already initialised?"

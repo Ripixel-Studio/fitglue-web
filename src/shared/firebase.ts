@@ -1,11 +1,9 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getMessaging, isSupported as isMessagingSupported, Messaging } from 'firebase/messaging';
 import { getFirestore, Firestore } from 'firebase/firestore';
 
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
-let messaging: Messaging | undefined;
 let firestore: Firestore | undefined;
 
 // Memoises an in-flight initialisation so concurrent callers share ONE init
@@ -52,21 +50,6 @@ export async function initFirebase(): Promise<{ app: FirebaseApp; auth: Auth; fi
     auth = getAuth(app);
     firestore = getFirestore(app);
 
-    // Messaging only works in browsers with service-worker + push + IndexedDB
-    // support. `getMessaging()` does NOT throw synchronously on an unsupported
-    // browser — it kicks off an async support probe and rejects a floating promise,
-    // which surfaces as an unhandled "messaging/unsupported-browser" FirebaseError
-    // (WEB-APP-1, seen from the native app's Android WebView). Ask first.
-    try {
-      if (await isMessagingSupported()) {
-        messaging = getMessaging(app);
-      } else {
-        console.warn('Messaging not supported in this environment');
-      }
-    } catch (e) {
-      console.warn('Messaging not supported in this environment', e);
-    }
-
     return { app, auth, firestore };
   })();
 
@@ -81,5 +64,4 @@ export async function initFirebase(): Promise<{ app: FirebaseApp; auth: Auth; fi
 
 export const getFirebaseApp = () => app;
 export const getFirebaseAuth = () => auth;
-export const getFirebaseMessaging = () => messaging;
 export const getFirebaseFirestore = () => firestore;

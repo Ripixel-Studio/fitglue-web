@@ -20,7 +20,7 @@ import type { PipelineRun } from "../models/pipeline/execution";
 import type { PluginManifest, PluginRegistryResponse } from "../models/plugin/manifest";
 import type { SubscriptionState } from "../models/user/billing";
 import type { UserIntegrations } from "../models/user/integration";
-import type { Counter, NotificationPreferences, PersonalRecord, UserProfile, UserTier } from "../models/user/profile";
+import type { Counter, PersonalRecord, UserProfile, UserTier } from "../models/user/profile";
 
 export const protobufPackage = "fitglue.gateway";
 
@@ -159,13 +159,6 @@ export interface SendEmailChangeGatewayRequest {
 
 export interface SendPasswordResetGatewayRequest {
   email: string;
-}
-
-/** FCM Token */
-export interface SetFCMTokenGatewayRequest {
-  token: string;
-  /** "web", "android", "ios" */
-  platform: string;
 }
 
 /** Pipelines */
@@ -537,9 +530,6 @@ export interface ClientGatewayService {
   BackfillConnectionActivities(
     request: BackfillConnectionActivitiesGatewayRequest,
   ): Promise<BackfillActivitiesGatewayResponse>;
-  /** ===================== Notification Preferences ===================== */
-  GetNotificationPrefs(request: EmptyRequest): Promise<NotificationPreferences>;
-  UpdateNotificationPrefs(request: NotificationPreferences): Promise<NotificationPreferences>;
   /** ===================== Counters ===================== */
   ListCounters(request: EmptyRequest): Promise<ListCountersGatewayResponse>;
   UpdateCounter(request: UpdateCounterGatewayRequest): Promise<Counter>;
@@ -560,8 +550,6 @@ export interface ClientGatewayService {
   SendVerificationEmail(request: EmptyRequest): Promise<Empty>;
   SendEmailChangeVerification(request: SendEmailChangeGatewayRequest): Promise<Empty>;
   SendPasswordReset(request: SendPasswordResetGatewayRequest): Promise<Empty>;
-  /** ===================== FCM Token ===================== */
-  SetFCMToken(request: SetFCMTokenGatewayRequest): Promise<Empty>;
   /** ===================== Mobile Sync ===================== */
   MobileSync(request: EmptyRequest): Promise<Empty>;
   /** ===================== Pipelines ===================== */

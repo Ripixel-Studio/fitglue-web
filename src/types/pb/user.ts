@@ -208,8 +208,6 @@ export interface UserRecord {
   integrations?:
     | UserIntegrations
     | undefined;
-  /** Field 4 was pipelines (moved to sub-collection users/{userId}/pipelines) */
-  fcmTokens: string[];
   /** Pricing tier */
   tier: UserTier;
   /** Athlete trial end date (null = no trial, set to now+30d on signup) */
@@ -229,18 +227,6 @@ export interface UserRecord {
   stripeCustomerId: string;
   /** Waitlist gate - false until admin enables access */
   accessEnabled: boolean;
-  /** User's push notification preferences */
-  notificationPreferences?: NotificationPreferences | undefined;
-}
-
-/** NotificationPreferences allows users to control what notifications they receive */
-export interface NotificationPreferences {
-  /** Notify when a pipeline needs user input (e.g., file upload, data selection) */
-  notifyPendingInput: boolean;
-  /** Notify when an activity is successfully synced to destinations */
-  notifyPipelineSuccess: boolean;
-  /** Notify when a pipeline fails to process an activity */
-  notifyPipelineFailure: boolean;
 }
 
 export interface PipelineConfig {

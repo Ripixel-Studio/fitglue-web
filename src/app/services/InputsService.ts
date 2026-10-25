@@ -5,7 +5,6 @@ import type { components } from '../../shared/api/schema-client';
 export type { PendingInput } from '../../types/pb/models/pipeline/pending_input';
 
 type SubmitInputRequest = components['schemas']['SubmitInputGatewayRequest'];
-type SetFCMTokenRequest = components['schemas']['SetFCMTokenGatewayRequest'];
 
 export interface InputResolutionRequest {
   activityId: string;
@@ -17,7 +16,6 @@ export interface IInputsService {
   dismissInput(activityId: string): Promise<boolean>;
   cancelPipeline(pendingInputId: string): Promise<boolean>;
   cancelPipelineRun(runId: string): Promise<boolean>;
-  setFCMToken(token: string): Promise<boolean>;
 }
 
 export const InputsService: IInputsService = {
@@ -30,12 +28,6 @@ export const InputsService: IInputsService = {
       params: { path: { inputId: request.activityId } },
       body,
     });
-    return true;
-  },
-
-  async setFCMToken(token: string) {
-    const body: SetFCMTokenRequest = { token };
-    await client.POST('/users/me/fcm-token', { body });
     return true;
   },
 

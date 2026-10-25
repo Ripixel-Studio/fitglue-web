@@ -31,7 +31,6 @@ import NotFoundPage from './pages/NotFoundPage';
 import ComponentLibraryPage from './pages/ComponentLibraryPage';
 
 
-import { useFCM } from './hooks/useFCM';
 import { useUser } from './hooks/useUser';
 
 // Initialize Sentry before app renders
@@ -114,8 +113,6 @@ const NativeBridge: React.FC = () => {
 const App: React.FC = () => {
   const [, setUser] = useAtom(userAtom);
   const [, setLoading] = useAtom(authLoadingAtom);
-
-  useFCM();
 
   useEffect(() => {
     const setup = async () => {

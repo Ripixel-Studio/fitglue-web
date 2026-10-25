@@ -21,14 +21,12 @@ vi.mock('../../shared/firebase', () => ({
   initFirebase: vi.fn().mockResolvedValue(null),
   getFirebaseAuth: () => ({ currentUser: null }),
   getFirebaseFirestore: () => ({}),
-  getFirebaseMessaging: () => null,
 }));
 vi.mock('firebase/auth', () => ({ onAuthStateChanged: vi.fn(), signInWithCustomToken: vi.fn() }));
 vi.mock('../../shared/nativeBridge', () => ({ isNativeApp: false, sendToNative: vi.fn() }));
 vi.mock('../../shared/api/client', () => ({ client: clientStub(), default: clientStub() }));
 vi.mock('../../shared/api/public-client', () => ({ publicClient: clientStub(), default: clientStub() }));
 vi.mock('../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
-vi.mock('../hooks/useFCM', () => ({ useFCM: vi.fn() }));
 vi.mock('../hooks/useUser', () => ({ useUser: () => ({ user: null, loading: true, error: null, refresh: vi.fn() }) }));
 
 import App from '../App';

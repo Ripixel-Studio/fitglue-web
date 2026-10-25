@@ -9,13 +9,6 @@ import type { ActivityType } from "../activity/source";
 
 export const protobufPackage = "fitglue.models.user";
 
-export enum NotificationChannel {
-  NOTIFICATION_CHANNEL_UNSPECIFIED = 0,
-  NOTIFICATION_CHANNEL_PUSH = 1,
-  NOTIFICATION_CHANNEL_EMAIL = 2,
-  UNRECOGNIZED = -1,
-}
-
 export enum UserTier {
   USER_TIER_UNSPECIFIED = 0,
   USER_TIER_HOBBYIST = 1,
@@ -30,7 +23,6 @@ export enum UserTier {
 export interface UserProfile {
   userId: string;
   createdAt?: Date | undefined;
-  fcmTokens: string[];
   tier: UserTier;
   isAdmin: boolean;
   /** Monthly sync tracking */
@@ -39,8 +31,6 @@ export interface UserProfile {
   preventedSyncCount: number;
   /** Waitlist gate - false until admin enables access */
   accessEnabled: boolean;
-  /** User's push notification preferences */
-  notificationPreferences?: NotificationPreferences | undefined;
   trialEndsAt?: Date | undefined;
   email: string;
   displayName: string;
@@ -51,24 +41,6 @@ export interface UserProfile {
    */
   currentStreakDays?: number | undefined;
   longestStreakDays?: number | undefined;
-}
-
-/**
- * NotificationTypePreference holds which channels are active for one notification type.
- * An empty channels list means the notification type is disabled entirely.
- * A nil/absent preference means "use the default" which is [PUSH].
- */
-export interface NotificationTypePreference {
-  channels: NotificationChannel[];
-}
-
-export interface NotificationPreferences {
-  pendingInput?: NotificationTypePreference | undefined;
-  pipelineSuccess?: NotificationTypePreference | undefined;
-  pipelineFailure?: NotificationTypePreference | undefined;
-  connectionAction?: NotificationTypePreference | undefined;
-  showcaseRoundup?: NotificationTypePreference | undefined;
-  pipelineCancelled?: NotificationTypePreference | undefined;
 }
 
 export interface Counter {

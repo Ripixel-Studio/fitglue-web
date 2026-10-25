@@ -115,7 +115,6 @@ Never call `Sentry.captureException()` or `console.error()` directly in applicat
 The only files exempt from this rule (they may import Sentry directly):
 - `src/shared/logger.ts`
 - `src/app/infrastructure/sentry.ts`
-- `src/app/firebase-messaging-sw.ts`
 - `src/app/hooks/useApi.ts`
 - `src/app/App.tsx`
 - `src/auth.ts`
@@ -202,7 +201,6 @@ Run `make generate` in `server/` — it writes directly to `../web/src/types/pb/
 
 ## Environment Variables
 
-- `VITE_FIREBASE_VAPID_KEY` — FCM web push key
 - `VITE_SENTRY_DSN` — Sentry DSN (optional, skip in dev)
 - `VITE_ENVIRONMENT` — `dev` or `prod` label for Sentry
 - Firebase config is NOT in env vars — it's loaded at runtime from `/__/firebase/init.json`
