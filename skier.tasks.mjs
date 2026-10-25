@@ -113,7 +113,6 @@ export const tasks = [
       /** @type {Record<string, string>} */
       const descriptions = {
         index: 'FitGlue connects your fitness apps and makes your data look amazing everywhere. AI descriptions, heart rate data, muscle heatmaps—synced automatically to Strava, Showcase, and more.',
-        showcase: 'Turn every workout into a beautiful public page—stats, maps, heart rate, muscle heatmaps and AI banners on one shareable link. No Strava account needed to view.',
         'how-it-works': 'Connect your fitness apps in minutes, stack the boosters you want, and choose where it all lands. FitGlue enriches every activity automatically and syncs it to Strava, Showcase, and more.',
         'the-magic': 'Explore the magic layer. See how FitGlue takes your raw workout data and transforms it into something extraordinary.',
         about: 'We believe your fitness apps should work together. FitGlue connects them and makes sure your data looks its best wherever it goes.',
@@ -126,7 +125,6 @@ export const tasks = [
       return {
         pageTitle: pageName.charAt(0).toUpperCase() + pageName.slice(1).replace(/-/g, ' '),
         isHome: currentPage === 'index',
-        isShowcase: currentPage === 'showcase',
         isHowItWorks: currentPage === 'how-it-works',
         isTheMagic: currentPage === 'the-magic',
         isAbout: currentPage === 'about',
