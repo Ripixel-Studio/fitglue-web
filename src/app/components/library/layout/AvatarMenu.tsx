@@ -7,7 +7,6 @@ interface AvatarMenuProps {
     email: string;
     initials: string;
     isAthlete: boolean;
-    isAdmin: boolean;
     profilePictureUrl?: string;
     syncsThisMonth?: number;
     onClose: () => void;
@@ -18,7 +17,6 @@ export const AvatarMenu: React.FC<AvatarMenuProps> = ({
     email,
     initials,
     isAthlete,
-    isAdmin,
     profilePictureUrl,
     syncsThisMonth,
     onClose,
@@ -91,14 +89,8 @@ export const AvatarMenu: React.FC<AvatarMenuProps> = ({
                 </Link>
             </div>
 
-            {/* Admin + Support */}
+            {/* Support */}
             <div className="avatar-menu__section">
-                {isAdmin && (
-                    <Link to="/admin" className="avatar-menu__item" onClick={handleItemClick}>
-                        <span className="avatar-menu__item-icon" aria-hidden="true">🛠</span>
-                        <span className="avatar-menu__item-label">Admin console</span>
-                    </Link>
-                )}
                 <a href="/help" className="avatar-menu__item" onClick={handleItemClick}>
                     <span className="avatar-menu__item-icon" aria-hidden="true">?</span>
                     <span className="avatar-menu__item-label">Help &amp; docs</span>

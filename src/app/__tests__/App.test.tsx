@@ -26,7 +26,6 @@ vi.mock('../../shared/firebase', () => ({
 vi.mock('firebase/auth', () => ({ onAuthStateChanged: vi.fn(), signInWithCustomToken: vi.fn() }));
 vi.mock('../../shared/nativeBridge', () => ({ isNativeApp: false, sendToNative: vi.fn() }));
 vi.mock('../../shared/api/client', () => ({ client: clientStub(), default: clientStub() }));
-vi.mock('../../shared/api/admin-client', () => ({ adminClient: clientStub(), default: clientStub() }));
 vi.mock('../../shared/api/public-client', () => ({ publicClient: clientStub(), default: clientStub() }));
 vi.mock('../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock('../hooks/useFCM', () => ({ useFCM: vi.fn() }));

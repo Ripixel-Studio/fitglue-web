@@ -25,11 +25,13 @@ export default defineConfig({
       ],
       // Ratchet floor: set to the current whole-codebase coverage so it can
       // never regress. Raise these as untested files gain tests.
+      // Ratchet floor = current whole-tree coverage. Lowered a few tenths when
+      // the (well-tested) admin console was deleted in the single-user conversion.
       thresholds: {
-        lines: 65.8,
-        functions: 52.5,
-        branches: 51.0,
-        statements: 62.95,
+        lines: 65.5,
+        functions: 52.2,
+        branches: 50.9,
+        statements: 62.8,
       },
     },
   },

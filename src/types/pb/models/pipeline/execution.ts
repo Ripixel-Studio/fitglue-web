@@ -109,12 +109,6 @@ export interface PipelineRun {
    * boosters[] is preserved for existing documents; new clients should prefer steps[].
    */
   steps: ExecutionStep[];
-  /**
-   * Owning user id. Not persisted on the per-user run documents (it is implied by
-   * the document path); populated by the admin cross-user listing so callers can
-   * act on the run. Empty on the user-facing API.
-   */
-  userId: string;
 }
 
 /** ExecutionStep is the unified record for a single step in a pipeline run. */

@@ -35,7 +35,6 @@ The React app is mounted at `/app`, so all routes are prefixed:
 | `/settings/enricher-data` | `EnricherDataPage` | Protected | Enricher data (PRs, etc.) |
 | `/settings/showcase` | `ShowcaseManagementPage` | Protected | Showcase management |
 | `/settings/integrations` | `ConnectionsPage` | Protected | Legacy redirect (prefer `/connections`) |
-| `/admin` | `AdminPage` | Admin | Admin console |
 | `*` | `NotFoundPage` | None | 404 handler |
 
 ## Route Configuration
@@ -70,9 +69,6 @@ The React app is mounted at `/app`, so all routes are prefixed:
     <Route path="/settings/upgrade" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
     <Route path="/settings/showcase" element={<ProtectedRoute><ShowcaseManagementPage /></ProtectedRoute>} />
 
-    {/* Admin-only */}
-    <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-
     {/* Catch-all */}
     <Route path="*" element={<NotFoundPage />} />
   </Routes>
@@ -95,24 +91,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   if (!user) {
     window.location.href = '/auth/login';
     return null;
-  }
-
-  return <>{children}</>;
-};
-```
-
-### AdminRoute
-
-Requires admin role:
-
-```typescript
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useUser();
-
-  if (loading) return <SkeletonLoading />;
-
-  if (!user?.isAdmin) {
-    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -206,7 +184,6 @@ pages/
 ├── SubscriptionPage.tsx           # Subscription management
 ├── ShowcaseManagementPage.tsx     # Showcase management
 ├── EnricherDataPage.tsx           # Personal records, etc.
-├── AdminPage.tsx                  # Admin console
 └── NotFoundPage.tsx               # 404 handler
 ```
 

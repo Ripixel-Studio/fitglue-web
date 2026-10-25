@@ -99,9 +99,9 @@ The `useUser` hook provides user profile data:
 ```typescript
 // src/app/hooks/useUser.ts
 export const useUser = () => {
-  const { user, loading, tier, isAdmin } = ...;
+  const { user, loading, tier } = ...;
 
-  return { user, loading, tier, isAdmin };
+  return { user, loading, tier };
 };
 ```
 
@@ -131,32 +131,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 ```
 
-### AdminRoute
-
-Wraps routes that require admin privileges:
-
-```typescript
-// src/app/App.tsx
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useUser();
-
-  if (loading) {
-    return <div className="container">Loading admin console...</div>;
-  }
-
-  if (!user?.isAdmin) {
-    return (
-      <div className="container">
-        <h2>Access Denied</h2>
-        <p>You do not have permission to view this page.</p>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-};
-```
-
 ### Route Configuration
 
 ```typescript
@@ -165,9 +139,6 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   {/* Protected app routes */}
   <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
   <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-
-  {/* Admin-only routes */}
-  <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
 
   {/* Catch-all */}
   <Route path="*" element={<NotFoundPage />} />

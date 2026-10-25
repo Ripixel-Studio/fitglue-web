@@ -3,20 +3,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { Provider, createStore } from 'jotai';
 import { CommandPalette } from '../CommandPalette';
-import { userProfileAtom } from '../../../../state/userState';
 
 function Wrapper({ children }: { children: React.ReactNode }) {
   return <MemoryRouter>{children}</MemoryRouter>;
-}
-
-function adminWrapper(isAdmin: boolean) {
-  const store = createStore();
-  store.set(userProfileAtom, { isAdmin } as never);
-  return function AdminWrapper({ children }: { children: React.ReactNode }) {
-    return <MemoryRouter><Provider store={store}>{children}</Provider></MemoryRouter>;
-  };
 }
 
 describe('CommandPalette', () => {
@@ -73,16 +63,5 @@ describe('CommandPalette', () => {
     render(<CommandPalette onClose={onClose} />, { wrapper: Wrapper });
     await userEvent.click(screen.getByText('Connections'));
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it('hides admin actions for non-admins', () => {
-    render(<CommandPalette onClose={vi.fn()} />, { wrapper: adminWrapper(false) });
-    expect(screen.queryByText('Admin: Console')).not.toBeInTheDocument();
-  });
-
-  it('shows admin actions for admins', () => {
-    render(<CommandPalette onClose={vi.fn()} />, { wrapper: adminWrapper(true) });
-    expect(screen.getByText('Admin: Console')).toBeInTheDocument();
-    expect(screen.getByText('Admin: Audit log')).toBeInTheDocument();
   });
 });

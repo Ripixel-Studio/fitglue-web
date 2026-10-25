@@ -65,8 +65,5 @@ describe('client modules', () => {
 
     const authed = (await import('../client')).default;
     expect(typeof authed.GET).toBe('function');
-
-    const admin = (await import('../admin-client')).default;
-    expect(typeof admin.GET).toBe('function');
   });
 });

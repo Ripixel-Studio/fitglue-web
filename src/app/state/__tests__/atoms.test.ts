@@ -29,12 +29,6 @@ import {
   isPluginRegistryLoadedAtom,
   pluginRegistryErrorAtom,
 } from '../pluginRegistryState';
-import {
-  adminActiveTabAtom,
-  selectedPipelineRunIdAtom,
-  userFiltersAtom,
-  pipelineRunFiltersAtom,
-} from '../adminState';
 
 describe('activitiesState defaults', () => {
   const store = createStore();
@@ -90,15 +84,5 @@ describe('pluginRegistryState defaults', () => {
     expect(store.get(isLoadingPluginRegistryAtom)).toBe(false);
     expect(store.get(isPluginRegistryLoadedAtom)).toBe(false);
     expect(store.get(pluginRegistryErrorAtom)).toBeNull();
-  });
-});
-
-describe('adminState defaults', () => {
-  const store = createStore();
-  it('has sensible initial values', () => {
-    expect(store.get(adminActiveTabAtom)).toBe('users');
-    expect(store.get(selectedPipelineRunIdAtom)).toBeNull();
-    expect(store.get(userFiltersAtom)).toEqual({});
-    expect(store.get(pipelineRunFiltersAtom)).toEqual({ limit: 50 });
   });
 });

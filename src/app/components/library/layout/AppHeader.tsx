@@ -184,7 +184,6 @@ export const AppHeader: React.FC = () => {
                                 email={email}
                                 initials={getInitials()}
                                 isAthlete={!!isAthlete}
-                                isAdmin={!!profile?.isAdmin}
                                 profilePictureUrl={profilePictureUrl || undefined}
                                 syncsThisMonth={profile?.syncCountThisMonth}
                                 onClose={() => setShowMenu(false)}

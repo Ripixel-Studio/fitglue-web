@@ -14,7 +14,6 @@ const baseProps = {
   email: 'alice@example.com',
   initials: 'AS',
   isAthlete: false,
-  isAdmin: false,
   onClose: vi.fn(),
 };
 
@@ -43,16 +42,6 @@ describe('AvatarMenu', () => {
   it('renders syncs label when provided', () => {
     render(<AvatarMenu {...baseProps} syncsThisMonth={12} />, { wrapper: Wrapper });
     expect(screen.getByText('12 SYNCS THIS MONTH')).toBeInTheDocument();
-  });
-
-  it('does not render admin link when not admin', () => {
-    render(<AvatarMenu {...baseProps} />, { wrapper: Wrapper });
-    expect(screen.queryByText('Admin console')).not.toBeInTheDocument();
-  });
-
-  it('renders admin link when isAdmin', () => {
-    render(<AvatarMenu {...baseProps} isAdmin />, { wrapper: Wrapper });
-    expect(screen.getByText('Admin console')).toBeInTheDocument();
   });
 
   it('calls onClose when Escape pressed', async () => {

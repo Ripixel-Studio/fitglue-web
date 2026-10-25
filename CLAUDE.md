@@ -41,7 +41,7 @@ web/
 │   ├── app/                  # React SPA
 │   │   ├── App.tsx           # All route definitions
 │   │   ├── main.tsx          # Entry point (Jotai Provider)
-│   │   ├── components/       # UI components (library/, dashboard/, admin/, wizard/, etc.)
+│   │   ├── components/       # UI components (library/, dashboard/, wizard/, etc.)
 │   │   ├── pages/            # Route page components
 │   │   ├── hooks/            # Custom hooks (useApi, useAuth, useRealtime*, usePlugin*)
 │   │   ├── state/            # Jotai atoms (authState, userState, pipelinesState, etc.)
@@ -53,11 +53,9 @@ web/
 │   │   ├── firebase.ts       # Firebase SDK init
 │   │   └── api/              # API clients + generated schemas
 │   │       ├── client.ts               # Authenticated client (/api/v2/*)
-│   │       ├── admin-client.ts         # Admin client (/api/admin/*)
 │   │       ├── public-client.ts        # Public client (no auth)
 │   │       ├── schema.ts               # Generated — DO NOT EDIT manually
 │   │       ├── schema-client.ts        # Generated — DO NOT EDIT manually
-│   │       ├── schema-admin.ts         # Generated — DO NOT EDIT manually
 │   │       └── schema-public.ts        # Generated — DO NOT EDIT manually
 │   └── types/pb/             # Generated protobuf types — DO NOT EDIT manually
 │
@@ -99,15 +97,13 @@ All global state lives in `src/app/state/`. Each atom file owns a domain:
 - `integrationsState.ts` — Connection statuses
 - `inputsState.ts` — Pending user inputs (mid-pipeline pauses)
 - `pluginRegistryState.ts` — All sources/enrichers/destinations
-- `adminState.ts` — Admin console state
 
 Each domain atom has a corresponding `useRealtime*` hook that attaches a Firestore listener and writes to the atom.
 
 ### API Clients
 
-Three openapi-fetch clients, all in `src/shared/api/`:
+Two openapi-fetch clients, all in `src/shared/api/`:
 - `client.ts` — Authenticated (Bearer token), base `/api/v2`
-- `admin-client.ts` — Admin endpoints, base `/api/admin`
 - `public-client.ts` — No auth required, public registry/showcase
 
 Never call the API directly — always use one of these clients or the service wrappers in `src/app/services/`.
@@ -168,7 +164,6 @@ All routes have basename `/app`. Protected routes require Firebase auth + `profi
 | `/settings/upgrade` | SubscriptionPage (alias) |
 | `/settings/showcase` | ShowcaseManagementPage |
 | `/settings/integrations` | ConnectionsPage (legacy redirect) |
-| `/admin` | AdminPage (admin only) |
 
 ## Common Tasks
 
@@ -198,7 +193,6 @@ Run `make generate` in `server/` — it writes directly to `../web/src/types/pb/
 | Path | Cloud Run Service |
 |------|------------------|
 | `/api/v2/**` | api-client |
-| `/api/admin/**` | api-admin |
 | `/api/public/**` | api-public |
 | `/api/webhooks/**` | api-webhook |
 | `/api/mobile/**` | api-webhook |

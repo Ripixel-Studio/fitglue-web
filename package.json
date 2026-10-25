@@ -22,7 +22,7 @@
     "deploy:prod": "firebase deploy --only hosting -P prod",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "gen-api": "npx openapi-typescript ../server/docs/api/gateway/client.openapi.yaml -o src/shared/api/schema-client.ts && npx openapi-typescript ../server/docs/api/gateway/admin.openapi.yaml -o src/shared/api/schema-admin.ts && npx openapi-typescript ../server/docs/api/gateway/public.openapi.yaml -o src/shared/api/schema-public.ts",
+    "gen-api": "npx openapi-typescript ../server/docs/api/gateway/client.openapi.yaml -o src/shared/api/schema-client.ts && npx openapi-typescript ../server/docs/api/gateway/public.openapi.yaml -o src/shared/api/schema-public.ts",
     "release": "standard-version --releaseCommitMessageFormat \"chore(release): {{currentTag}} [skip ci]\"",
     "generate-changelog": "npx tsx scripts/generate-public-changelog.ts",
     "generate-changelog:ai": "npx tsx scripts/generate-public-changelog.ts --ai-polish",
