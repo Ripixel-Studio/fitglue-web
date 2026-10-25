@@ -51,9 +51,4 @@ describe('InputsService', () => {
       body: { runId: 'r1' },
     });
   });
-
-  it('setFCMToken posts the token', async () => {
-    expect(await InputsService.setFCMToken('tok')).toBe(true);
-    expect(POST).toHaveBeenCalledWith('/users/me/fcm-token', { body: { token: 'tok' } });
-  });
 });

@@ -7,7 +7,7 @@
 /* eslint-disable */
 import type { Empty } from "../../google/protobuf/empty";
 import type { UserIntegrations } from "../../models/user/integration";
-import type { Counter, NotificationPreferences, PersonalRecord, UserProfile } from "../../models/user/profile";
+import type { Counter, PersonalRecord, UserProfile } from "../../models/user/profile";
 
 export const protobufPackage = "fitglue.services.user";
 
@@ -91,15 +91,6 @@ export interface DeleteIntegrationRequest {
 
 export interface ListIntegrationsRequest {
   userId: string;
-}
-
-export interface GetNotificationPrefsRequest {
-  userId: string;
-}
-
-export interface UpdateNotificationPrefsRequest {
-  userId: string;
-  prefs?: NotificationPreferences | undefined;
 }
 
 export interface ListCountersRequest {
@@ -200,13 +191,6 @@ export interface DeleteCounterRequest {
   counterId: string;
 }
 
-export interface SetFCMTokenRequest {
-  userId: string;
-  token: string;
-  /** "web", "android", "ios" */
-  platform: string;
-}
-
 export interface UserService {
   CreateUser(request: CreateUserRequest): Promise<UserProfile>;
   GetProfile(request: GetProfileRequest): Promise<UserProfile>;
@@ -216,8 +200,6 @@ export interface UserService {
   SetIntegration(request: SetIntegrationRequest): Promise<Empty>;
   DeleteIntegration(request: DeleteIntegrationRequest): Promise<Empty>;
   ListIntegrations(request: ListIntegrationsRequest): Promise<UserIntegrations>;
-  GetNotificationPrefs(request: GetNotificationPrefsRequest): Promise<NotificationPreferences>;
-  UpdateNotificationPrefs(request: UpdateNotificationPrefsRequest): Promise<NotificationPreferences>;
   ListCounters(request: ListCountersRequest): Promise<ListCountersResponse>;
   UpdateCounter(request: UpdateCounterRequest): Promise<Counter>;
   GetBoosterData(request: GetBoosterDataRequest): Promise<GetBoosterDataResponse>;
@@ -242,6 +224,4 @@ export interface UserService {
   DeletePluginDefaults(request: DeletePluginDefaultsRequest): Promise<Empty>;
   /** Counter deletion */
   DeleteCounter(request: DeleteCounterRequest): Promise<Empty>;
-  /** FCM Token registration for push notifications */
-  SetFCMToken(request: SetFCMTokenRequest): Promise<Empty>;
 }

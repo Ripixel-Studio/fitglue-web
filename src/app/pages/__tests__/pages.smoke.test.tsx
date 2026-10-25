@@ -38,7 +38,6 @@ vi.mock('../../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn
 vi.mock('../../../shared/firebase', () => ({
   getFirebaseAuth: () => ({ currentUser: null }),
   getFirebaseFirestore: () => ({}),
-  getFirebaseMessaging: () => null,
   initFirebase: vi.fn().mockResolvedValue({ auth: {}, firestore: {} }),
 }));
 vi.mock('firebase/auth', () => ({

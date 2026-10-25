@@ -8,7 +8,6 @@ import { useUser } from '../hooks/useUser';
 import { useAuth } from '../hooks/useAuth';
 import { userAtom } from '../state/authState';
 import { getEffectiveTier, TIER_ATHLETE, TIER_HOBBYIST, HOBBYIST_TIER_LIMITS } from '../utils/tier';
-import { NotificationPreferencesCard } from '../components/NotificationPreferencesCard';
 import { ReauthModal } from '../components/ReauthModal';
 import { useToast, Button, Badge } from '../components/library/ui';
 import { SettingsLayout } from '../components/library/layout';
@@ -363,16 +362,6 @@ const AccountSettingsPage: React.FC = () => {
                             </div>
                         </section>
                     )}
-
-                    {/* Notifications section */}
-                    <div className="fg-band fg-band--ink">
-                        <span className="fg-band__label">NOTIFICATIONS</span>
-                    </div>
-                    <section className="stx-section">
-                        <div className="stx-section__body" style={{ padding: 0 }}>
-                            <NotificationPreferencesCard />
-                        </div>
-                    </section>
 
                     {/* Data Rights section */}
                     <section className="stx-section">

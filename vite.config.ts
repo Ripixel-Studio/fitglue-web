@@ -1,40 +1,7 @@
-import { defineConfig, loadEnv, build } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { resolve } from 'path';
-
-// Custom plugin to build service worker as IIFE (service workers don't support ES modules)
-function serviceWorkerBuildPlugin() {
-  return {
-    name: 'service-worker-build',
-    apply: 'build' as const,
-    async closeBundle() {
-      console.log('Building service worker as IIFE...');
-      await build({
-        configFile: false,
-        build: {
-          lib: {
-            entry: resolve(__dirname, 'src/app/firebase-messaging-sw.ts'),
-            formats: ['iife'],
-            name: 'FirebaseMessagingSW',
-            fileName: () => 'firebase-messaging-sw.js',
-          },
-          outDir: 'dist',
-          emptyOutDir: false,
-          sourcemap: 'hidden',
-          minify: true,
-          rollupOptions: {
-            output: {
-              inlineDynamicImports: true,
-            },
-          },
-        },
-        logLevel: 'info',
-      });
-      console.log('Service worker build complete.');
-    },
-  };
-}
 
 export default defineConfig(({ mode }) => {
   // Load environment variables based on the mode (development, production, etc.)
@@ -52,8 +19,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      // Build service worker separately as IIFE
-      serviceWorkerBuildPlugin(),
       // Upload source maps if Sentry is configured (regardless of mode)
       isSentryEnabled && sentryVitePlugin({
         org: process.env.SENTRY_ORG || env.SENTRY_ORG,

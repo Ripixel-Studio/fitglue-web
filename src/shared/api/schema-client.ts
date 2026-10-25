@@ -563,23 +563,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/me/fcm-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description ===================== FCM Token ===================== */
-        post: operations["ClientGatewayService_SetFCMToken"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/users/me/integrations": {
         parameters: {
             query?: never;
@@ -640,23 +623,6 @@ export interface paths {
         put?: never;
         /** @description ===================== Mobile Sync ===================== */
         post: operations["ClientGatewayService_MobileSync"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me/notification-prefs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description ===================== Notification Preferences ===================== */
-        get: operations["ClientGatewayService_GetNotificationPrefs"];
-        put: operations["ClientGatewayService_UpdateNotificationPrefs"];
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1808,22 +1774,6 @@ export interface components {
             secondary?: string[];
             imageUrl?: string;
         };
-        NotificationPreferences: {
-            pendingInput?: components["schemas"]["NotificationTypePreference"];
-            pipelineSuccess?: components["schemas"]["NotificationTypePreference"];
-            pipelineFailure?: components["schemas"]["NotificationTypePreference"];
-            connectionAction?: components["schemas"]["NotificationTypePreference"];
-            showcaseRoundup?: components["schemas"]["NotificationTypePreference"];
-            pipelineCancelled?: components["schemas"]["NotificationTypePreference"];
-        };
-        /**
-         * @description NotificationTypePreference holds which channels are active for one notification type.
-         *      An empty channels list means the notification type is disabled entirely.
-         *      A nil/absent preference means "use the default" which is [PUSH].
-         */
-        NotificationTypePreference: {
-            channels?: ("NOTIFICATION_CHANNEL_UNSPECIFIED" | "NOTIFICATION_CHANNEL_PUSH" | "NOTIFICATION_CHANNEL_EMAIL")[];
-        };
         OAuthConnectResponse: {
             url?: string;
         };
@@ -2210,11 +2160,6 @@ export interface components {
             maxHeartRate?: number;
             /** Format: int32 */
             minHeartRate?: number;
-        };
-        /** @description FCM Token */
-        SetFCMTokenGatewayRequest: {
-            token?: string;
-            platform?: string;
         };
         SetPersonalRecordGatewayRequest: {
             recordType?: string;
@@ -2771,7 +2716,6 @@ export interface components {
             userId?: string;
             /** Format: date-time */
             createdAt?: string;
-            fcmTokens?: string[];
             /**
              * Format: enum
              * @enum {string}
@@ -2789,8 +2733,6 @@ export interface components {
             preventedSyncCount?: number;
             /** @description Waitlist gate - false until admin enables access */
             accessEnabled?: boolean;
-            /** @description User's push notification preferences */
-            notificationPreferences?: components["schemas"]["NotificationPreferences"];
             /** Format: date-time */
             trialEndsAt?: string;
             email?: string;
@@ -4054,37 +3996,6 @@ export interface operations {
             };
         };
     };
-    ClientGatewayService_SetFCMToken: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetFCMTokenGatewayRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Default error response */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Status"];
-                };
-            };
-        };
-    };
     ClientGatewayService_ListIntegrations: {
         parameters: {
             query?: never;
@@ -4253,68 +4164,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Default error response */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Status"];
-                };
-            };
-        };
-    };
-    ClientGatewayService_GetNotificationPrefs: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationPreferences"];
-                };
-            };
-            /** @description Default error response */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Status"];
-                };
-            };
-        };
-    };
-    ClientGatewayService_UpdateNotificationPrefs: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["NotificationPreferences"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationPreferences"];
-                };
             };
             /** @description Default error response */
             default: {

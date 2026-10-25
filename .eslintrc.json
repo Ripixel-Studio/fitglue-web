@@ -54,7 +54,6 @@
         "src/shared/api/throwing-client.ts",
         "src/app/hooks/useApi.ts",
         "src/app/App.tsx",
-        "src/app/firebase-messaging-sw.ts",
         "src/auth.ts"
       ],
       "rules": {
