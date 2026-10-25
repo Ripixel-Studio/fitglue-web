@@ -15,6 +15,8 @@
   .lp-dest__name { font-family: var(--fg-font-display); font-size: .75rem; text-transform: uppercase; letter-spacing: -.005em; }
   .lp-dest__status { font-family: var(--fg-font-mono); font-size: .5625rem; letter-spacing: .12em; color: var(--fg-cyan); text-transform: uppercase; }
   .lp-trio { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(240,238,230,0.08); }
+  .lp-hero__notice { margin-top: 20px; font-family: var(--fg-font-mono); font-size: .6875rem; font-weight: 700; letter-spacing: .1em; color: var(--color-text-muted); text-transform: uppercase; }
+  .lp-hero__notice a { color: var(--fg-cyan); text-decoration: none; }
 
   .lp-platforms { padding: 18px 32px; border-top: 1px solid rgba(240,238,230,0.08); border-bottom: 1px solid rgba(240,238,230,0.08); background: var(--fg-ink-2); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; overflow: hidden; }
   .lp-platforms__intro { font-family: var(--fg-font-mono); font-size: .5625rem; font-weight: 700; letter-spacing: .14em; color: var(--color-text-muted); text-transform: uppercase; flex-shrink: 0; }
@@ -28,13 +30,13 @@
   <!-- Hero -->
   <div class="lp-hero">
     <div class="lp-hero__text">
-      <div class="lp-hero__eyebrow">FITNESS DATA PLATFORM · v{{version}} · FREE FOREVER</div>
+      <div class="lp-hero__eyebrow">FITNESS DATA PLATFORM · v{{version}}</div>
       <h1 class="lp-hero__title">ONE SWEAT.<br><span class="gr">EVERY PLACE.</span></h1>
       <p class="lp-hero__sub">FitGlue pulls workouts from Strava, Hevy, Fitbit, Health Connect, Parkrun and more — runs them through {{boosters.length}} boosters, then ships polished activities to wherever your training really lives.</p>
       <div class="lp-hero__cta">
-        <a href="{{waitlistUrl}}" class="btn--aurora">START FREE →</a>
         <a href="/how-it-works" class="btn--ghost">SEE HOW IT WORKS</a>
       </div>
+      <p class="lp-hero__notice">FitGlue is now a personal project. James's fitness lives at <a href="https://ripixel.co.uk/life">ripixel.co.uk/life</a>.</p>
       <div class="lp-hero__stats">
         <div>
           <div class="lp-hero__stat-n">{{activitiesBoostedCount}}</div>
@@ -135,16 +137,6 @@
       <div class="lp-pillar__title">Share</div>
       <p class="lp-pillar__body">Your enriched activity lands wherever you point it — Strava with a real description, your public Showcase page, TrainingPeaks, Intervals.icu. Fan-out to all of them at once.</p>
       <a href="/showcase" class="lp-pillar__link">EXPLORE SHOWCASE →</a>
-    </div>
-  </div>
-
-  <!-- Final CTA -->
-  <div class="lp-cta-wrap">
-    <div class="lp-cta-wrap__title">One sweat.<br><span class="gr">Every place.</span></div>
-    <div class="lp-cta-wrap__sub">30-DAY TRIAL · NO CREDIT CARD · CANCEL ANY TIME · FREE FOREVER ON HOBBYIST</div>
-    <div class="lp-cta-wrap__btns">
-      <a href="{{waitlistUrl}}" class="btn--aurora">START FREE →</a>
-      <a href="/pricing" class="btn--ghost">SEE PRICING</a>
     </div>
   </div>
 

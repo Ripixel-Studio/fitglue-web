@@ -54,9 +54,6 @@
   .faq-item__a { font-family: var(--fg-font-body); font-size: .9375rem; color: var(--color-text-muted); line-height: 1.6; }
 
   /* ── CTA ── */
-  .hiw-cta { padding: 64px 32px; text-align: center; border-top: var(--fg-rule-thin); }
-  .hiw-cta__title { font-family: var(--fg-font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -.025em; text-transform: uppercase; margin-bottom: 24px; }
-  .hiw-cta__title .gr { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .btn-aurora { display: inline-flex; align-items: center; gap: 6px; padding: 14px 24px; background: var(--gradient-primary); color: var(--fg-ink); font-family: var(--fg-font-display); font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; border: 0; cursor: pointer; text-decoration: none; }
   .btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 14px 24px; background: transparent; color: var(--fg-paper); box-shadow: inset 0 0 0 1.5px var(--fg-paper); font-family: var(--fg-font-display); font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; border: 0; cursor: pointer; text-decoration: none; margin-left: 12px; }
 
@@ -93,7 +90,6 @@
     .ph { padding: 40px 16px; }
     .hiw-faq { padding: 48px 16px; }
     .faq-item { padding: 18px 16px; }
-    .hiw-cta { padding: 48px 16px; }
     .dark-band, .feat-band { flex-wrap: wrap; gap: 4px; }
   }
 </style>
@@ -220,13 +216,6 @@
       <div class="faq-item__q">What happens to my data if I cancel?</div>
       <div class="faq-item__a">Your data stays yours. If you cancel your Athlete subscription, you'll drop to the free Hobbyist tier — your pipelines and history remain intact, you just lose access to premium features. If you delete your account, we permanently remove all your data from our servers.</div>
     </div>
-  </div>
-
-  <!-- CTA -->
-  <div class="hiw-cta">
-    <p class="hiw-cta__title">Ready to <span class="gr">try it?</span></p>
-    <a href="/auth/register" class="btn-aurora">GET STARTED FREE →</a>
-    <a href="/showcase" class="btn-ghost">SEE SHOWCASE</a>
   </div>
 </main>
 

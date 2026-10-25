@@ -67,12 +67,11 @@ The React app uses a **split architecture** for data access:
 |-----|-------------|
 | `/` | `static-dist/index.html` |
 | `/features` | `static-dist/features.html` |
-| `/pricing` | `static-dist/pricing.html` |
 | `/how-it-works` | `static-dist/how-it-works.html` |
 | `/connections/*` | Dynamic pages from registry |
 | `/boosters/*` | Dynamic pages from registry |
 | `/guides/*` | Static guide pages |
-| `/auth/*` | Auth pages (login, register, etc.) |
+| `/auth/*` | Auth pages (login, logout, password reset, etc.) |
 
 ### React SPA
 | URL | Page Component |

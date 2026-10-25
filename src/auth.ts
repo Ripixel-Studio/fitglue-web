@@ -4,7 +4,6 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   User
@@ -75,7 +74,6 @@ async function init() {
       if (landingNav) {
         landingNav.innerHTML = `
             <a href="/auth/login" class="nav-link">Login</a>
-            <a href="/auth/register" class="btn primary small">Sign Up</a>
         `;
       }
     }
@@ -114,20 +112,6 @@ async function init() {
     } catch (error: unknown) {
       console.error('Login Error', error);
       alert(error instanceof Error ? error.message : 'Login failed');
-    }
-  });
-
-  // Register
-  bindClick('btn-register', async () => {
-    const emailEl = document.getElementById('reg-email') as HTMLInputElement;
-    const passEl = document.getElementById('reg-password') as HTMLInputElement;
-    if (!emailEl?.value || !passEl?.value) return alert('Fill in all fields');
-
-    try {
-      await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value);
-    } catch (error: unknown) {
-      console.error('Registration Error', error);
-      alert(error instanceof Error ? error.message : 'Registration failed');
     }
   });
 

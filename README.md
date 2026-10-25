@@ -14,8 +14,8 @@ The frontend hosting layer for the FitGlue fitness data platform. Contains a **m
 │  │   Marketing Site    │     │     React App       │       │
 │  │   (Skier SSG)       │     │     (Vite)          │       │
 │  │                     │     │                     │       │
-│  │  /, /features,      │     │  /app/**            │       │
-│  │  /pricing, etc.     │     │                     │       │
+│  │  /, /how-it-works,  │     │  /app/**            │       │
+│  │  /guides, etc.      │     │                     │       │
 │  └─────────────────────┘     └─────────────────────┘       │
 │                                                             │
 └────────────────────────────────────────────────────────────┘

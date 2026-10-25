@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## Unreleased
+
+### Removed
+
+* **marketing:** FitGlue is a single-user personal project now (rethink F0.1). Removed the public sign-up surface: `/pricing`, `/auth/register`, `/auth/waitlist-confirmed`, every "start free" / "get started" / "see pricing" CTA across the home, how-it-works, about, showcase, guides, help and dynamic connection/booster pages, the pricing links in the header and footer, and the unused `templates/guide.html` waitlist template. `robots.txt` now disallows all crawling in every environment (it is emitted by the Skier build from `robots.disallow.txt`; the CI-side swap was removed because it ran before the build emptied `dist/` and never took effect). The home page carries a notice that James's fitness now lives at ripixel.co.uk/life. `/auth/login`, `/auth/access-pending`, `/@*`, `/showcase/**` and `/app/**` are untouched.
+
 ### [11.94.19](https://github.com/fitglue/web/compare/v11.94.18...v11.94.19) (2026-10-04)
 
 ### [11.94.18](https://github.com/fitglue/web/compare/v11.94.17...v11.94.18) (2026-10-04)

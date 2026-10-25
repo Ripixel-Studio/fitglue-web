@@ -8,7 +8,7 @@
         <meta name="keywords"
             content="workout transformation, Strava enhancement, Hevy to Strava, Fitbit heart rate, muscle heatmap, workout enrichment, fitness automation, AI workout descriptions, gym to Strava, parkrun results">
         <meta name="author" content="FitGlue">
-        <meta name="robots" content="index, follow">
+        <meta name="robots" content="noindex, nofollow">
         <meta name="theme-color" content="#ff3da6">
 
         <!-- Open Graph -->
@@ -72,13 +72,12 @@
   <nav class="mh__nav">
     <a href="/how-it-works" {{#if isHowItWorks}}class="on"{{/if}}>HOW IT WORKS</a>
     <a href="/showcase" {{#if isShowcase}}class="on"{{/if}}>SHOWCASE</a>
-    <a href="/pricing" {{#if isPricing}}class="on"{{/if}}>PRICING</a>
     <a href="/guides" {{#if isGuides}}class="on"{{/if}}>GUIDES</a>
     <a href="/help" {{#if isHelp}}class="on"{{/if}}>HELP</a>
   </nav>
   <div class="mh__cta">
     <span id="nav-auth-login"><a href="/auth/login" class="btn--ghost">LOG IN</a></span>
-    <span id="nav-auth-cta"><a href="/auth/register" class="btn--aurora">START FREE →</a></span>
+    <span id="nav-auth-cta" style="display:none"><a href="/app" class="btn--aurora">GO TO DASHBOARD →</a></span>
   </div>
   <button class="mh__ham" id="nav-toggle" aria-label="Toggle navigation">
     <span></span><span></span><span></span>
@@ -90,10 +89,7 @@
       var loginItem = document.getElementById('nav-auth-login');
       var ctaItem = document.getElementById('nav-auth-cta');
       if (loginItem) loginItem.style.display = 'none';
-      if (ctaItem) {
-        var ctaLink = ctaItem.querySelector('a');
-        if (ctaLink) { ctaLink.href = '/app'; ctaLink.textContent = 'GO TO DASHBOARD →'; }
-      }
+      if (ctaItem) ctaItem.style.display = '';
     }
     var toggle = document.getElementById('nav-toggle');
     if (toggle) {
