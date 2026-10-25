@@ -15,6 +15,31 @@
         "source": "/features",
         "destination": "/how-it-works",
         "type": 301
+      },
+      {
+        "regex": "^/@james/(?P<key>week-\\d{2}-\\d{4}|month-\\d{2}-\\d{4}|year-\\d{4})/?$",
+        "destination": "https://james.ripixel.co.uk/life/roundup/:key",
+        "type": 301
+      },
+      {
+        "regex": "^/@james/(?P<slug>[^/]+)/?$",
+        "destination": "https://james.ripixel.co.uk/life/activity/:slug/",
+        "type": 301
+      },
+      {
+        "regex": "^/@james(/.*)?$",
+        "destination": "https://james.ripixel.co.uk/life",
+        "type": 301
+      },
+      {
+        "regex": "^/showcase/.+$",
+        "destination": "https://james.ripixel.co.uk/life",
+        "type": 301
+      },
+      {
+        "regex": "^/@.*$",
+        "destination": "/",
+        "type": 302
       }
     ],
     "headers": [

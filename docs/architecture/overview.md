@@ -72,6 +72,23 @@ The React app uses a **split architecture** for data access:
 | `/guides/*` | Static guide pages |
 | `/auth/*` | Auth pages (login, logout, password reset, etc.) |
 
+### Showcase redirects (rethink S4.1)
+The public showcase moved to `https://james.ripixel.co.uk/life`; `firebase.json` `redirects` send the old
+fitglue.tech URLs there. Firebase applies the **first** matching redirect and checks redirects before static
+files and rewrites, so the order below is load-bearing (roundup keys share the `/@james/:id` shape with
+activity slugs, so the roundup rule must come first):
+
+| Old URL | Redirect |
+|---------|----------|
+| `/@james/<week-WW-YYYY \| month-MM-YYYY \| year-YYYY>` | 301 `https://james.ripixel.co.uk/life/roundup/<key>` |
+| `/@james/<slug>` | 301 `https://james.ripixel.co.uk/life/activity/<slug>/` |
+| `/@james`, `/@james/`, `/@james/**` (deeper) | 301 `https://james.ripixel.co.uk/life` |
+| `/showcase/<anything>` | 301 `https://james.ripixel.co.uk/life` (`/showcase` itself is still the marketing page) |
+| any other `/@*` | 302 `/` |
+
+Trailing slashes and query strings are preserved by Firebase. The `/@*` and `/showcase/**` rewrites to
+`showcase-app/index.html` sit below these and are unreachable until F1.5b deletes the SPA.
+
 ### React SPA
 | URL | Page Component |
 |-----|----------------|
