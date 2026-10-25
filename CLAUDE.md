@@ -53,10 +53,8 @@ web/
 │   │   ├── firebase.ts       # Firebase SDK init
 │   │   └── api/              # API clients + generated schemas
 │   │       ├── client.ts               # Authenticated client (/api/v2/*)
-│   │       ├── public-client.ts        # Public client (no auth)
 │   │       ├── schema.ts               # Generated — DO NOT EDIT manually
-│   │       ├── schema-client.ts        # Generated — DO NOT EDIT manually
-│   │       └── schema-public.ts        # Generated — DO NOT EDIT manually
+│   │       └── schema-client.ts        # Generated — DO NOT EDIT manually
 │   └── types/pb/             # Generated protobuf types — DO NOT EDIT manually
 │
 ├── pages/                    # Handlebars marketing pages (Skier input)
@@ -102,9 +100,8 @@ Each domain atom has a corresponding `useRealtime*` hook that attaches a Firesto
 
 ### API Clients
 
-Two openapi-fetch clients, all in `src/shared/api/`:
+One openapi-fetch client in `src/shared/api/`:
 - `client.ts` — Authenticated (Bearer token), base `/api/v2`
-- `public-client.ts` — No auth required, public registry/showcase
 
 Never call the API directly — always use one of these clients or the service wrappers in `src/app/services/`.
 

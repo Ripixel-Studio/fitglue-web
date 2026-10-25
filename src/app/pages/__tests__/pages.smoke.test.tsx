@@ -33,7 +33,6 @@ function clientStub() {
 }
 
 vi.mock('../../../shared/api/client', () => ({ client: clientStub(), default: clientStub() }));
-vi.mock('../../../shared/api/public-client', () => ({ publicClient: clientStub(), default: clientStub() }));
 vi.mock('../../../shared/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
 vi.mock('../../../shared/firebase', () => ({
   getFirebaseAuth: () => ({ currentUser: null }),

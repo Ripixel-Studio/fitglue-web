@@ -83,11 +83,11 @@ activity slugs, so the roundup rule must come first):
 | `/@james/<week-WW-YYYY \| month-MM-YYYY \| year-YYYY>` | 301 `https://james.ripixel.co.uk/life/roundup/<key>` |
 | `/@james/<slug>` | 301 `https://james.ripixel.co.uk/life/activity/<slug>/` |
 | `/@james`, `/@james/`, `/@james/**` (deeper) | 301 `https://james.ripixel.co.uk/life` |
-| `/showcase/<anything>` | 301 `https://james.ripixel.co.uk/life` (`/showcase` itself is still the marketing page) |
+| `/showcase`, `/showcase/<anything>` | 301 `https://james.ripixel.co.uk/life` |
 | any other `/@*` | 302 `/` |
 
-Trailing slashes and query strings are preserved by Firebase. The `/@*` and `/showcase/**` rewrites to
-`showcase-app/index.html` sit below these and are unreachable until F1.5b deletes the SPA.
+Trailing slashes and query strings are preserved by Firebase. The React showcase SPA, its `/@*` and
+`/showcase/**` rewrites and the `/showcase` marketing page were deleted in F1.5b.
 
 ### React SPA
 | URL | Page Component |

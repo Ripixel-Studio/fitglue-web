@@ -59,11 +59,8 @@ describe('createErrorMiddleware', () => {
 
 describe('client modules', () => {
   it('expose typed GET/POST methods', async () => {
-    const pub = (await import('../public-client')).default;
-    expect(typeof pub.GET).toBe('function');
-    expect(typeof pub.POST).toBe('function');
-
     const authed = (await import('../client')).default;
     expect(typeof authed.GET).toBe('function');
+    expect(typeof authed.POST).toBe('function');
   });
 });

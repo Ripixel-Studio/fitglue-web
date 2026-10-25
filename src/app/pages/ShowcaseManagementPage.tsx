@@ -5,7 +5,6 @@ import { Stack, SettingsLayout, SubNavTabs } from '../components/library/layout'
 import { Button, Paragraph, Card, Heading, Link, CardSkeleton, Avatar, Pagination } from '../components/library/ui';
 import { FormField, Input, Textarea, Toggle } from '../components/library/forms';
 import { client } from '../../shared/api/client';
-import { publicClient } from '../../shared/api/public-client';
 import { useToast } from '../components/library/ui/Toast/Toast';
 import { ImageCropModal } from '../components/ImageCropModal';
 import { formatActivityType, formatActivitySource } from '../../types/pb/enum-formatters';
@@ -61,14 +60,6 @@ interface ShowcaseProfile {
     links?: ShowcaseLink[];
     callouts?: ShowcaseBioCallout[];
 }
-
-type ShowcaseRoundup = {
-    roundupId?: string;
-    periodKey?: string;
-    totalActivities?: number;
-    totalDistanceMeters?: number;
-    totalDurationSeconds?: number;
-};
 
 const THEME_PRESETS = [
     { id: 'default', name: 'FitGlue Classic', accent: '#ff3da6', gradient: 'linear-gradient(135deg, #0a0a0a, #1a0a20, #0a0a0a)' },
@@ -170,8 +161,6 @@ const ShowcaseManagementPage: React.FC = () => {
     const [roundupMonthly, setRoundupMonthly] = useState(false);
     const [roundupYearly, setRoundupYearly] = useState(false);
     const [savingRoundup, setSavingRoundup] = useState(false);
-    const [recentRoundups, setRecentRoundups] = useState<ShowcaseRoundup[]>([]);
-    const [recomputingKey, setRecomputingKey] = useState<string | null>(null);
 
     // View metrics (aggregate + per-showcase)
     const [viewStats, setViewStats] = useState<ShowcaseViewStatsList | null>(null);
@@ -234,14 +223,6 @@ const ShowcaseManagementPage: React.FC = () => {
     }, [fetchProfile, fetchPreferences]);
 
     // Save profile fields
-
-    useEffect(() => {
-        if (activeSection !== 'roundup' || !profile?.slug) return;
-        publicClient
-            .GET('/showcase/{slug}/roundups/recent', { params: { path: { slug: profile.slug }, query: { page: 1 } } })
-            .then(({ data }) => { if (data?.roundups) setRecentRoundups(data.roundups as ShowcaseRoundup[]); })
-            .catch(() => { /* non-critical */ });
-    }, [activeSection, profile?.slug]);
 
     // Lazy-load view metrics when the Views tab is opened.
     useEffect(() => {
@@ -452,21 +433,6 @@ const ShowcaseManagementPage: React.FC = () => {
             showError('Failed to save roundup settings');
         } finally {
             setSavingRoundup(false);
-        }
-    };
-
-    const handleRecomputeRoundup = async (periodKey: string) => {
-        setRecomputingKey(periodKey);
-        try {
-            await client.POST('/users/me/showcase-management/roundup/{periodKey}/recompute', {
-                params: { path: { periodKey } },
-            });
-            showSuccess(`Roundup recomputed — refresh the page to see updated stats`);
-        } catch (err) {
-            logger.error('Failed to recompute roundup:', err);
-            showError('Failed to recompute roundup');
-        } finally {
-            setRecomputingKey(null);
         }
     };
 
@@ -1192,50 +1158,6 @@ const ShowcaseManagementPage: React.FC = () => {
                                     disabled={savingRoundup}
                                 />
 
-                                {recentRoundups.length > 0 && (
-                                    <>
-                                        <div style={{ marginTop: '0.5rem', fontWeight: 700, fontSize: '0.8125rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Generated roundups</div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                            {recentRoundups.map((r) => {
-                                                const url = `https://fitglue.tech/@${profile?.slug}/${r.periodKey}`;
-                                                const isRecomputing = recomputingKey === r.periodKey;
-                                                return (
-                                                    <div key={r.roundupId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', background: 'var(--color-surface-raised)' }}>
-                                                        <div>
-                                                            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{r.periodKey}</div>
-                                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                                                                {r.totalActivities} session{r.totalActivities === 1 ? '' : 's'}
-                                                                {r.totalDistanceMeters && r.totalDistanceMeters > 1000 ? ` · ${(r.totalDistanceMeters / 1000).toFixed(0)} km` : ''}
-                                                            </div>
-                                                        </div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                            <button
-                                                                onClick={() => r.periodKey && handleRecomputeRoundup(r.periodKey)}
-                                                                disabled={isRecomputing || !!recomputingKey}
-                                                                title="Recompute this roundup (use if you've logged more activities for this period)"
-                                                                style={{
-                                                                    fontSize: '0.75rem',
-                                                                    color: isRecomputing ? 'var(--color-text-muted)' : 'var(--color-text-muted)',
-                                                                    background: 'none',
-                                                                    border: '1px solid var(--color-border)',
-                                                                    borderRadius: '0.25rem',
-                                                                    padding: '0.2rem 0.5rem',
-                                                                    cursor: isRecomputing ? 'default' : 'pointer',
-                                                                    fontFamily: 'var(--fg-font-mono)',
-                                                                    letterSpacing: '0.06em',
-                                                                    textTransform: 'uppercase',
-                                                                }}
-                                                            >
-                                                                {isRecomputing ? '⟳ Computing…' : '⟳ Recompute'}
-                                                            </button>
-                                                            <a href={url} target="_blank" rel="noreferrer" style={{ fontSize: '0.8125rem', color: 'var(--fg-cyan)', textDecoration: 'none', fontWeight: 500 }}>View →</a>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </>
-                                )}
                             </Stack>
                         </Card>
                     )}

@@ -37,6 +37,11 @@
         "type": 301
       },
       {
+        "source": "/showcase",
+        "destination": "https://james.ripixel.co.uk/life",
+        "type": 301
+      },
+      {
         "regex": "^/@.*$",
         "destination": "/",
         "type": 302
@@ -99,27 +104,8 @@
         }
       },
       {
-        "source": "/api/public/**",
-        "run": {
-          "serviceId": "api-public",
-          "region": "us-central1"
-        }
-      },
-      {
         "source": "/app/**",
         "destination": "/app/index.html"
-      },
-      {
-        "source": "/@*/**",
-        "destination": "/showcase-app/index.html"
-      },
-      {
-        "source": "/@*",
-        "destination": "/showcase-app/index.html"
-      },
-      {
-        "source": "/showcase/**",
-        "destination": "/showcase-app/index.html"
       }
     ]
   }

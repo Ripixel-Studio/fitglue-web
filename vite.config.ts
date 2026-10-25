@@ -66,7 +66,6 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           app: resolve(__dirname, 'public/app/index.html'),
-          showcase: resolve(__dirname, 'public/showcase-app/index.html'),
         },
         output: {
           sourcemapExcludeSources: true,
