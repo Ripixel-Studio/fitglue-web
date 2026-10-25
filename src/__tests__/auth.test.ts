@@ -74,7 +74,8 @@ describe('auth.ts bootstrap', () => {
     await flush();
     mocks.authCallback?.(null);
     expect(nav.innerHTML).toContain('Login');
-    expect(nav.innerHTML).toContain('Sign Up');
+    expect(nav.innerHTML).not.toContain('Sign Up');
+    expect(nav.innerHTML).not.toContain('/auth/register');
   });
 
   it('wires up the Google login button', async () => {

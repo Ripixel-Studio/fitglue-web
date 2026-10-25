@@ -27,9 +27,6 @@
   .guide-card__link { font-family: var(--fg-font-mono); font-size: .75rem; font-weight: 700; letter-spacing: .12em; color: var(--fg-cyan); margin-top: auto; text-transform: uppercase; }
 
   /* ── CTA ── */
-  .guide-cta { padding: 48px 32px; text-align: center; border-top: var(--fg-rule-thin); }
-  .guide-cta__title { font-family: var(--fg-font-display); font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.025em; text-transform: uppercase; margin-bottom: 20px; }
-  .guide-cta__title .gr { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .btn-aurora { display: inline-flex; align-items: center; gap: 6px; padding: 14px 28px; background: var(--gradient-primary); color: var(--fg-ink); font-family: var(--fg-font-display); font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; border: 0; cursor: pointer; }
 
   @media (max-width: 900px) {
@@ -40,7 +37,6 @@
     .guide-grid { grid-template-columns: 1fr; padding: 0 16px 48px; }
     .guide-card--featured { grid-column: span 1; flex-direction: column; }
     .ph { padding: 40px 16px; }
-    .guide-cta { padding: 40px 16px; }
   }
 </style>
 
@@ -119,12 +115,6 @@
         <span class="guide-card__link">READ GUIDE →</span>
       </div>
     </a>
-  </div>
-
-  <!-- CTA -->
-  <div class="guide-cta">
-    <h2 class="guide-cta__title">Ready to <span class="gr">get started?</span></h2>
-    <a href="/auth/register" class="btn-aurora">START FREE →</a>
   </div>
 </main>
 

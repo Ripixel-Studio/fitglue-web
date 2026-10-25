@@ -12,6 +12,7 @@ import {
   generateItemsTask,
 } from 'skier';
 import path from 'path';
+import { copyFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { fetchRegistryTask } from './tasks/fetchRegistryTask.js';
 import { generateDynamicPagesTask } from './tasks/generateDynamicPagesTask.js';
@@ -72,6 +73,18 @@ export const tasks = [
     to: './dist',
   }),
 
+  // robots.txt: the site is a personal project now and is not crawled. One
+  // source file, emitted by the build itself for every environment.
+  {
+    name: 'copy-robots',
+    title: 'Copy robots.disallow.txt to dist/robots.txt',
+    config: {},
+    run: async () => {
+      await copyFile(path.join(__dirname, 'robots.disallow.txt'), path.join(__dirname, 'dist', 'robots.txt'));
+      return {};
+    },
+  },
+
   // Parse PUBLIC_CHANGELOG.md into structured entries for the changelog page
   parseChangelogTask({
     mdPath: './PUBLIC_CHANGELOG.md',
@@ -86,7 +99,6 @@ export const tasks = [
       year: new Date().getFullYear(),
       cacheHash,
       appUrl: '/app',
-      waitlistUrl: '/auth/register',
     },
   }),
 
@@ -104,7 +116,6 @@ export const tasks = [
         showcase: 'Turn every workout into a beautiful public page—stats, maps, heart rate, muscle heatmaps and AI banners on one shareable link. No Strava account needed to view.',
         'how-it-works': 'Connect your fitness apps in minutes, stack the boosters you want, and choose where it all lands. FitGlue enriches every activity automatically and syncs it to Strava, Showcase, and more.',
         'the-magic': 'Explore the magic layer. See how FitGlue takes your raw workout data and transforms it into something extraordinary.',
-        pricing: 'Simple, honest pricing. Start free, upgrade when you need more. Or self-host—it\'s open source.',
         about: 'We believe your fitness apps should work together. FitGlue connects them and makes sure your data looks its best wherever it goes.',
         contact: 'Have a question or suggestion? We\'d love to hear from you.',
         privacy: 'Your data is yours. Read our commitment to privacy and security.',
@@ -118,7 +129,6 @@ export const tasks = [
         isShowcase: currentPage === 'showcase',
         isHowItWorks: currentPage === 'how-it-works',
         isTheMagic: currentPage === 'the-magic',
-        isPricing: currentPage === 'pricing',
         isAbout: currentPage === 'about',
         isContact: currentPage === 'contact',
         isPrivacy: currentPage === 'privacy',
@@ -139,7 +149,6 @@ export const tasks = [
       /** @type {Record<string, {pageTitle: string, description: string}>} */
       const authMeta = {
         login: { pageTitle: 'Login', description: 'Welcome back! Log in to continue your fitness transformation.' },
-        register: { pageTitle: 'Create Account', description: 'Join FitGlue and start transforming your workouts into stories worth sharing.' },
         'forgot-password': { pageTitle: 'Reset Password', description: 'Reset your password to get back to your extraordinary workouts.' },
         'verify-email': { pageTitle: 'Verify Email', description: 'Verify your email to complete your FitGlue account setup.' },
         logout: { pageTitle: 'Logged Out', description: 'You\'ve been logged out of FitGlue. See you next workout!' },
@@ -209,7 +218,7 @@ export const tasks = [
         },
         faq: {
           pageTitle: 'Frequently Asked Questions',
-          description: 'Quick answers to common questions about FitGlue, pricing, sync limits, and more.',
+          description: 'Quick answers to common questions about FitGlue, sync limits, and more.',
         },
         feedback: {
           pageTitle: 'Request a Feature',

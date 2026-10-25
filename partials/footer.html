@@ -10,7 +10,6 @@
         <div class="mf__col-h">PRODUCT</div>
         <a href="/how-it-works">How It Works</a>
         <a href="/showcase">Showcase</a>
-        <a href="/pricing">Pricing</a>
         <a href="/changelog">Changelog</a>
       </div>
       <div class="mf__col">
@@ -71,26 +70,14 @@
         const loginItem = document.getElementById('nav-auth-login');
         const ctaItem = document.getElementById('nav-auth-cta');
         if (loginItem) loginItem.style.display = 'none';
-        if (ctaItem) {
-          const ctaLink = ctaItem.querySelector('a');
-          if (ctaLink) {
-            ctaLink.href = '/app';
-            ctaLink.textContent = 'GO TO DASHBOARD →';
-          }
-        }
+        if (ctaItem) ctaItem.style.display = '';
       }
 
       function applyLoggedOutState() {
         const loginItem = document.getElementById('nav-auth-login');
         const ctaItem = document.getElementById('nav-auth-cta');
         if (loginItem) loginItem.style.display = '';
-        if (ctaItem) {
-          const ctaLink = ctaItem.querySelector('a');
-          if (ctaLink) {
-            ctaLink.href = '/auth/register';
-            ctaLink.textContent = 'START FREE →';
-          }
-        }
+        if (ctaItem) ctaItem.style.display = 'none';
       }
     } catch (e) {
       console.warn('Auth check failed:', e);

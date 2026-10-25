@@ -71,9 +71,6 @@
   .req-conn__desc { font-family: var(--fg-font-body); font-size: .8125rem; color: var(--color-text-muted); line-height: 1.4; margin-top: 2px; }
 
   /* ── CTA ── */
-  .plugin-cta { padding: 64px 32px; text-align: center; border-top: var(--fg-rule-thin); }
-  .plugin-cta__title { font-family: var(--fg-font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -.025em; text-transform: uppercase; margin-bottom: 24px; }
-  .plugin-cta__title .gr { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .btn-aurora { display: inline-flex; align-items: center; gap: 6px; padding: 14px 24px; background: var(--gradient-primary); color: var(--fg-ink); font-family: var(--fg-font-display); font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; border: 0; cursor: pointer; text-decoration: none; }
 
   @media (max-width: 900px) {
@@ -305,16 +302,6 @@
     {{/each}}
   </div>
   {{/if}}
-
-  <!-- CTA -->
-  <div class="plugin-cta">
-    <p class="plugin-cta__title">
-      {{#if isSource}}Start syncing with <span class="gr">{{name}}</span>{{/if}}
-      {{#if isEnricher}}Add <span class="gr">{{name}}</span> to your pipeline{{/if}}
-      {{#if isDestination}}Start publishing to <span class="gr">{{name}}</span>{{/if}}
-    </p>
-    <a href="/auth/register" class="btn-aurora">GET STARTED FREE →</a>
-  </div>
 </main>
 
 {{> footer}}

@@ -72,7 +72,6 @@ The main site header with navigation:
       <a href="/" class="logo">{{siteName}}</a>
       <ul class="nav-links">
         <li><a href="/features" {{#if isFeatures}}class="active"{{/if}}>Features</a></li>
-        <li><a href="/pricing" {{#if isPricing}}class="active"{{/if}}>Pricing</a></li>
         <li><a href="{{appUrl}}">Dashboard</a></li>
       </ul>
     </nav>
@@ -91,7 +90,6 @@ Site footer with links and copyright:
           <h4>Product</h4>
           <ul>
             <li><a href="/features">Features</a></li>
-            <li><a href="/pricing">Pricing</a></li>
           </ul>
         </div>
         <!-- More sections -->
@@ -282,7 +280,6 @@ Descriptions are defined per-page in `additionalVarsFn`:
 const descriptions = {
   index: 'Watch your workout become extraordinary...',
   features: 'Connect everywhere, enhance everything...',
-  pricing: 'Simple, honest pricing. Start free, upgrade when you need more.',
   // ...
 };
 ```
@@ -294,7 +291,6 @@ Use page flags to highlight the current page:
 ```html
 <nav>
   <a href="/features" {{#if isFeatures}}class="active"{{/if}}>Features</a>
-  <a href="/pricing" {{#if isPricing}}class="active"{{/if}}>Pricing</a>
   <a href="/how-it-works" {{#if isHowItWorks}}class="active"{{/if}}>How It Works</a>
 </nav>
 ```
@@ -305,7 +301,6 @@ Flags are set in `additionalVarsFn`:
 return {
   isHome: currentPage === 'index',
   isFeatures: currentPage === 'features',
-  isPricing: currentPage === 'pricing',
   isHowItWorks: currentPage === 'how-it-works',
 };
 ```

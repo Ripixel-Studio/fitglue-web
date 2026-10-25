@@ -31,9 +31,6 @@
   .value-card__body { font-family: var(--fg-font-body); font-size: .9375rem; line-height: 1.55; color: var(--color-text-muted); }
 
   /* ── CTA ── */
-  .about-cta { padding: 64px 32px; text-align: center; border-top: var(--fg-rule-thin); }
-  .about-cta__title { font-family: var(--fg-font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -.025em; text-transform: uppercase; margin-bottom: 24px; }
-  .about-cta__title .gr { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .btn-aurora { display: inline-flex; align-items: center; gap: 6px; padding: 14px 24px; background: var(--gradient-primary); color: var(--fg-ink); font-family: var(--fg-font-display); font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; border: 0; cursor: pointer; }
 
   @media (max-width: 900px) {
@@ -43,7 +40,6 @@
     .ph { padding: 40px 16px; }
     .about-wrap { padding: 0 16px 48px; }
     .values-grid { padding: 0 16px 48px; }
-    .about-cta { padding: 48px 16px; }
   }
 </style>
 
@@ -90,12 +86,6 @@
       <div class="value-card__title">No Lock-In</div>
       <div class="value-card__body">The proto schemas are public. The architecture is documented. You can export everything. We earn your trust every month, or you leave — that's the deal.</div>
     </div>
-  </div>
-
-  <!-- CTA -->
-  <div class="about-cta">
-    <p class="about-cta__title">Join us on the <span class="gr">journey.</span></p>
-    <a href="/auth/register" class="btn-aurora">START FREE →</a>
   </div>
 </main>
 
