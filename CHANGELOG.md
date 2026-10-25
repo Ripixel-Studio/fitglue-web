@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## Unreleased
+
+### Changed
+
+* **hosting:** the public showcase now lives at https://james.ripixel.co.uk/life (rethink S4.1). `firebase.json` 301s every old showcase URL there: `/@james` → `/life`, `/@james/<period-key>` (`week-WW-YYYY`, `month-MM-YYYY`, `year-YYYY`) → `/life/roundup/<key>`, any other `/@james/<slug>` → `/life/activity/<slug>/`, deeper `/@james/**` and `/showcase/<anything>` → `/life`; any other `/@*` profile 302s to `/`. Redirects are matched before rewrites, so the `/@*` and `/showcase/**` SPA rewrites are now unreachable (the SPA itself is deleted in F1.5b). The marketing home-page notice and the Showcase page's "see it live" links point at james.ripixel.co.uk/life. The `/showcase` marketing page itself is unchanged.
+
 ### [11.94.22](https://github.com/fitglue/web/compare/v11.94.21...v11.94.22) (2026-10-25)
 
 ### [11.94.21](https://github.com/fitglue/web/compare/v11.94.20...v11.94.21) (2026-10-25)
